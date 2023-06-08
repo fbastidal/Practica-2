@@ -50,23 +50,108 @@ Important: si escolliu un dataset diferent al proposat és important que aquest 
 
 # Descripció del dataset
 
+Inicialment s'havia pensat en aprofitar les dades recopilades durant la primera pràctica, relacionades amb dades de navegació de vaixells. No obstant, després de valorar-ho, no trobavem com poder utilitzar-lo de forma bastant gràfica i que ens permetés realitzar un estudi estadístic com el que es demana a l'enunciat, pel que finalment hem decidit utilitzar el conjunt de dades que es posa com a exemple a l'enunciat, ja que considerem que resulta molt interessant i pot donar més joc al estar relacionat amb temes de salut.
+
+El conjunt de dades seleccionat proporciona informació sobre diferents factors que podrien estar relacionats amb malalties cardiovasculars, més concretament amb predir la probabilitat de patir un atac de cor.
+
+Es tracta d'un conjunt de dades que ens permetrà realitzar un estudi en major profunditat de possibles problemes del cor, molt més centrat en els atacs de cor, al tenir una variable que està directament relacionada amb el resultat que es va obtenir durant l'estudi dels pacients i que ens ens permeti buscar un model que permeti determinar la probabilitat de patir un atac de cor per part de persones segons els valors dels diferents factors d'estudi.
+
+Per poder facilitar aquest anàlisi, el dataset conté el fitxer *heart.csv* amb les següents variables/atributs:
+
+* **age**: edat del pacient
+* **sex**: gènere del pacient 
+    * 0 = femení
+    * 1 = masculí
+* **cp**: tipus de dolor toràcic que experimenta el pacient
+    * 0 = angina típica
+    * 1 = angina atípica
+    * 2 = dolor no relacionat amb angina
+    * 3 = asimptomàtic (sense dolor toràcic))
+* **trtbps**: pressió arterial en repòs (mm Hg)
+* **chol**: nivell de colesterol (md/dl)
+* **fbs**: nivell de sucre en sang en dejú
+    * 0 = normal
+    * 1 = alt)
+* **restecg**: resultat de l'electrocardiograma en repòs
+    * 0 = normal
+    * 1 = anomalies en l'ona ST-T
+    * 2 = hipertrofia ventricular esquerra probable o definitiva segons els criteris d'Estes
+* **thalachh**: freqüència cardíaca màxima registrada pel pacient durant les proves realitzades
+* **exng**: angina provocada per l'exercici
+    * 0 = no
+    * 1 = sí
+* **oldpeak**: canvis en el segment ST de l'electrocardiograma després de l'exercici físic
+* **slp**: patró de canvi en el segment ST de l'electrocardiograma durant una prova d'esforç o situacions d'estrès
+    * 0 = pendent plana
+    * 1 = pendent ascendent (canvi en el patró elèctric del cor)
+    * 2 = pendent descendent (canvi en el patró elèctric del cor)
+* **caa**: nombre de vasos sanguinis coronaris que mostren obstrucció o estenosi significativa
+    * 0 = sense obstrucció detectada
+    * 1 = obstrucció en un dels vasos sanguinis
+    * 2 = obstrucció en dos dels vasos sanguinis
+    * 3 = obstrucció en tres dels vasos sanguinis
+    * 4 = obstrucció en els quatre vasos sanguinis
+* **thall**: relacionat amb una malaltia hereditària de la sang anomenada talassèmia
+    * 1 = no s'ha detectat cap indici
+    * 2 = presència d'un defecte fix
+    * 3 = presència d'un defecte reversible
+* **output**: probabilitat de patir un atac de cor:
+    * 0 = sense o poca probabilitat
+    * 1 = major probabilitat
+
+Per altra banda, el fitxer *o2Saturation.csv* conté el que sem,blen múltiples observacions relacionades amb el nivell de saturació d'oxigen, però no s'ha trobat una manera de relacionar-los directament amb el fitxer anterior, ja que solament conté moltíssimes més observacions (3586 en total) sense cap tipus d'idenfificador que ens permeti poder realitzar una integració de les dades d'ambdós fitxers per tenir un conjunt més complet.
 
 
 # Integració i selecció de les dades d’interès a analitzar
 
-Abans de començar, és necessari carregar el fitxer en un data frame que ens permeti treballar de forma còmode amb les dades:
+Abans de començar, és necessari carregar el fitxer en un data frame que ens permeti treballar de forma còmode amb les dades a través del codi en R:
 
-```{r 1_carrega_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
+```{r 1_1_carrega_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
 # El joc de dades està conformat per un fitxer CSV, amb separació per comes i amb una capçalera, pel que carreguem el fitxer utilitzant la següent funció:
 dfHeartAttack <- read.csv("..\\dataset\\heart.csv", header=TRUE)
-
-# Mostrem la informació bàsica del data frame per comprovar si s'han de realitzar canvis a simple vista:
-str(dfHeartAttack)
 ```
 
+Una vegada carregades totes les dades, procedim a un primer anàlisi ràpid a partir del resum estadístic del data frame:
+
+```{r 1_2_estadistiques_basiques_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
+# Mostrem la informació bàsica del data frame per comprovar si s'han de realitzar canvis a simple vista:
+str(dfHeartAttack)
+
+# Mostrem també un resum estadístic de les variables/atributs que conformen el joc de dades:
+summary(dfHeartAttack)
+```
+
+Veiem que tenim un joc de dades compost per un total de 303 observacions i 14 variables. Per seleccionar aquelles variables que puguin estar més directament relacionades amb l'atac de cor, realitzem un primer anàlisi exploratòria que ens permeti entendre millor el conjunt de dades:
+
+```{r 1_3_grafics_distribucio_dades, echo=TRUE, message=FALSE, warning=FALSE}
+# Carreguem les llibreries necessàries per realitzar els diferents gràfics que anirem generant:
+if (!require("ggplot2")) install.packages("ggplot2"); library("ggplot2")
+if (!require("ggpubr")) install.packages("ggpubr"); library("ggpubr")
+if (!require("grid")) install.packages("grid"); library("grid")
+if (!require("gridExtra")) install.packages("gridExtra"); library("gridExtra")
+
+# Visualitzem la quantitat d'observacions que s'han identificat amb una probabilitat més alta i més baixa que es van identificar en  referència als atacs de cor:
+ggplot(dfHeartAttack,aes(factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")), fill=factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")))) + 
+    geom_bar() +labs(x="Probabilitat", y="Quantitat d'observacions") + 
+		guides(fill=guide_legend(title="")) + 
+		scale_fill_manual(values=c("#008000","#800000")) + 
+		ggtitle("Probabilitat d'atac de cor") +
+    theme(axis.text.x = element_text(hjust = 1))
+
+# Calculem la proporció per poder tenir una idea de com es reparteixen les observacions:
+table(dfHeartAttack$output)/length(dfHeartAttack$output)
+```
+
+Veiem que les dades estan molt repartides
 
 
 # Neteja de les dades
+
+## Valors nul·ls
+
+## Valors atípics
+
+## Normalització
 
 
 # Anàlisi de les dades

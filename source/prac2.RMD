@@ -121,9 +121,11 @@ str(dfHeartAttack)
 summary(dfHeartAttack)
 ```
 
-Veiem que tenim un joc de dades compost per un total de 303 observacions i 14 variables. Per seleccionar aquelles variables que puguin estar més directament relacionades amb l'atac de cor, realitzem un primer anàlisi exploratòria que ens permeti entendre millor el conjunt de dades:
+Veiem que tenim un joc de dades compost per un total de 303 observacions i 14 variables. Per altra banda, a simple vista no s'observen valors que puguin ser considerats com *outliers*, tot i que ho veurem amb major detall més endavant. Per altra banda, 
 
-```{r 1_3_grafics_distribucio_dades, echo=TRUE, message=FALSE, warning=FALSE}
+Per seleccionar aquelles variables que puguin estar més directament relacionades amb l'atac de cor, realitzem un primer anàlisi exploratori que ens permeti entendre millor el conjunt de dades:
+
+```{r 1_3_grafic_distribucio_probabilitat_atac_cor_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
 # Carreguem les llibreries necessàries per realitzar els diferents gràfics que anirem generant:
 if (!require("ggplot2")) install.packages("ggplot2"); library("ggplot2")
 if (!require("ggpubr")) install.packages("ggpubr"); library("ggpubr")
@@ -132,7 +134,7 @@ if (!require("gridExtra")) install.packages("gridExtra"); library("gridExtra")
 
 # Visualitzem la quantitat d'observacions que s'han identificat amb una probabilitat més alta i més baixa que es van identificar en  referència als atacs de cor:
 ggplot(dfHeartAttack,aes(factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")), fill=factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")))) + 
-    geom_bar() +labs(x="Probabilitat", y="Quantitat d'observacions") + 
+    geom_bar() +labs(x="Probabilitat", y="Pacients") + 
 		guides(fill=guide_legend(title="")) + 
 		scale_fill_manual(values=c("#008000","#800000")) + 
 		ggtitle("Probabilitat d'atac de cor") +
@@ -142,7 +144,43 @@ ggplot(dfHeartAttack,aes(factor(output, levels = c(0, 1), labels = c("Baixa", "A
 table(dfHeartAttack$output)/length(dfHeartAttack$output)
 ```
 
-Veiem que les dades estan molt repartides
+Veiem que les dades estan molt repartides entre els pacients que tenen una probabilitat major i menor de patir un atac de cor segons els factors registrats.
+
+Creem uns quants gràfics que ens permetin veure la relació entre les variables i la probabilitat de patir un atac de cor:
+
+```{r 1_4_grafics_distribuciovariables_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
+plotbyAge <- ggplot(dfHeartAttack,aes(age, fill=factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")))) + 
+					geom_bar() +labs(x="Edat", y="Pacients") + 
+					guides(fill=guide_legend(title="")) + 
+				  scale_fill_manual(values=c("#008000","#800000")) + 
+					ggtitle("Probabilitat per edat") +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+plotbySex <- ggplot(dfHeartAttack,aes(factor(sex, levels = c(0, 1), labels = c("Femení", "Masculí")), fill=factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")))) + 
+					geom_bar() +labs(x="Gènere", y="Pacients") + 
+					guides(fill=guide_legend(title="")) + 
+				  scale_fill_manual(values=c("#008000","#800000")) + 
+					ggtitle("Probabilitat per gènere") +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+plotbyCP <- ggplot(dfHeartAttack,aes(factor(cp, levels = c(0, 1, 2, 3), labels = c("Angina típica", "Angina atípica", "No angina", "Assimptomàtic")), fill=factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")))) + 
+					geom_bar() +labs(x="Tipus de dolor", y="Pacients") + 
+					guides(fill=guide_legend(title="")) + 
+				  scale_fill_manual(values=c("#008000","#800000")) + 
+					ggtitle("Probabilitat per dolor toràcic") +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+plotbyFBS <- ggplot(dfHeartAttack,aes(factor(fbs, levels = c(0, 1), labels = c("Normal", "Alt")), fill=factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")))) + 
+					geom_bar() +labs(x="Nivell de sucre", y="Pacients") + 
+					guides(fill=guide_legend(title="")) + 
+				  scale_fill_manual(values=c("#008000","#800000")) + 
+					ggtitle("Probabilitat per nivell de sucre") +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Mostrem els quatre gràfics de forma agrupada:
+grid.newpage()
+grid.arrange(plotbyAge, plotbySex, plotbyCP, plotbyFBS, ncol=2)
+```
 
 
 # Neteja de les dades
@@ -157,8 +195,11 @@ Veiem que les dades estan molt repartides
 # Anàlisi de les dades
 
 
+
 # Representació dels resultats a partir de taules i gràfiques
 
 
+
 # Resolució del problema
+
 

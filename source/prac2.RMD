@@ -131,6 +131,7 @@ if (!require("ggplot2")) install.packages("ggplot2"); library("ggplot2")
 if (!require("ggpubr")) install.packages("ggpubr"); library("ggpubr")
 if (!require("grid")) install.packages("grid"); library("grid")
 if (!require("gridExtra")) install.packages("gridExtra"); library("gridExtra")
+if (!require("GGally")) install.packages("GGally"); library("GGally")
 
 # Visualitzem la quantitat d'observacions que s'han identificat amb una probabilitat més alta i més baixa que es van identificar en  referència als atacs de cor:
 ggplot(dfHeartAttack,aes(factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")), fill=factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")))) + 
@@ -151,7 +152,7 @@ Creem uns quants gràfics que ens permetin veure la relació entre les variables
 ```{r 1_4_grafics_distribuciovariables_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
 plotbyAge <- ggplot(dfHeartAttack,aes(age, fill=factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")))) + 
 					geom_bar() +labs(x="Edat", y="Pacients") + 
-					guides(fill=guide_legend(title="")) + 
+					guides(fill=guide_legend(title="")) +
 				  scale_fill_manual(values=c("#008000","#800000")) + 
 					ggtitle("Probabilitat per edat") +
           theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -248,7 +249,14 @@ grid.newpage()
 grid.arrange(plotbySLP, plotbyThalachh, plotbyCAA, plotbyThall, ncol=2)
 ```
 
-Observant els diversos factors que es troben dins el conjunt de dades, sembla que la variància entre els diferents valors i la seva relació amb la probabilitat de patir un atac de cor podria ser interessant mantenir tots els atributs que tenim per poder utilitzar-los durant la resta de l'anàlisi.
+Finalment, creem un gràfic on es mostrin les possibles relacions existentes entre les variables per veure, de forma ràpida, si podem veure algunes correlacions de forma directa:
+
+```{r 1_5_grafic_dispersio_variables_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
+# Generem un gràfic que compara parells de variables entre elles, el que ens permet
+ggpairs(data = dfHeartAttack, columns = 1:13)
+```
+
+Observant els diversos factors que es troben dins el conjunt de dades i tots els gràfics creats, sembla que la variància entre els diferents valors, així com la, a priori, poca correlació entre les variables i la seva relació amb la probabilitat de patir un atac de cor podria ser interessant mantenir tots els atributs que tenim per poder utilitzar-los durant la resta de l'anàlisi.
 
 
 # Neteja de les dades
@@ -314,7 +322,9 @@ En resum, no s'han trobat valors anòmals que puguin considerar-se fora dels val
 
 ## Normalització
 
-Comencem 
+La normalització de les dades ens permet obtenir valors en escales que permetin comparar la magnitud de forma similar entre els diferents rangs de valors que tenen les variables. Tot i que podriem portar a terme aquest procés, no es considera útil en el nostre cas, ja que no ens permetria entendre de forma ràpida els resultats dels anàlisis per exemple si es busca els resultats per algú d'una edat específica, sent necessari un càlcul previ per aplicar la mateixa escala.
+
+Per tant, s'ha decidit no normalitzar les observacions del joc de dades, tot i que seria possible si es volgués millorar una mica el rendiment al utilitzar un conjunt de dades que fos molt més gran que el que ens ocupa.
 
 
 ## Discretització
@@ -341,11 +351,86 @@ summary(dfHeartAttack$chol_disc)
 summary(dfHeartAttack$thalachh_disc)
 ```
 
+Observem
 
 
 # Anàlisi de les dades
 
+## Test de normalitat
+
+Per facilitar els càlculs futurs, es procedirà a un anàlisi de la normalitat dels valors numèrics del conjunt de dades, el que ens permetrà saber si és possible aplicar certs tests més endavant. 
+
+Comencem amb un test de Shapiro-Wilk de normalitat:
+
+```{r 3_1_test_normalitat_variables_numeriques_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
+# Realitzem el test de normalitat Shapiro-Wilk a les diferents variables:
+shapiro.test(dfHeartAttack$age)
+shapiro.test(dfHeartAttack$trtbps)
+shapiro.test(dfHeartAttack$chol)
+shapiro.test(dfHeartAttack$oldpeak)
+shapiro.test(dfHeartAttack$thalachh)
+```
+
+Tots els test mostren que les variables no segueixen una distribució totalment normal. No obstant, pel *Teorema del Límit Central*, al tractar-se d'una quantitat elevada d'observacions, es pot considerar que tendeixen a una distribució normal. Per corroborar aquest punt, generem els gràfics QQ per veure si la tendència és normal o no:
+
+```{r 3_2_grafic_qq_variables_numeriques_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
+# Creem els diferents gràfics QQ per comprovar si les dades de les variables segueixen o s'aproximen a una distribució normal:
+qqAge <- ggplot(data = dfHeartAttack, aes(sample = age)) +
+  geom_qq() +
+  geom_qq_line() +
+  labs(x = "Valors teòrics", y = "Valors observats") +
+  ggtitle("Gràfic QQnorm: 'age'")
+
+qqTRTBPS <- ggplot(data = dfHeartAttack, aes(sample = trtbps)) +
+  geom_qq() +
+  geom_qq_line() +
+  labs(x = "Valors teòrics", y = "Valors observats") +
+  ggtitle("Gràfic QQnorm: 'trtbps'")
+
+qqChol <- ggplot(data = dfHeartAttack, aes(sample = chol)) +
+  geom_qq() +
+  geom_qq_line() +
+  labs(x = "Valors teòrics", y = "Valors observats") +
+  ggtitle("Gràfic QQnorm: 'chol'")
+
+qqOldpeak <- ggplot(data = dfHeartAttack, aes(sample = oldpeak)) +
+  geom_qq() +
+  geom_qq_line() +
+  labs(x = "Valors teòrics", y = "Valors observats") +
+  ggtitle("Gràfic QQnorm: 'oldpeak'")
+
+qqThalachh <- ggplot(data = dfHeartAttack, aes(sample = thalachh)) +
+  geom_qq() +
+  geom_qq_line() +
+  labs(x = "Valors teòrics", y = "Valors observats") +
+  ggtitle("Gràfic QQnorm: 'thalachh'")
+
+# Mostrem els diferents gràfics de forma agrupada:
+grid.newpage()
+grid.arrange(qqAge, qqTRTBPS, qqChol, qqOldpeak, qqThalachh, ncol=3)
+```
+
+Amb els resultats obtinguts, podem observar que les variables numèriques, tot i no tenir un a distribució normal, sí semblen tendir a aquesta. L'únic cas que podriem considerar que no és tant així seria per la variable *oldpeak*, ja que és la única que no té una distribució tant propera a la línia que podriem considerar que defineix la normalitat.
+
+
 ## Correlació de les variables
+
+Tot i que ja s'ha vist anteriorment que semblava que no hi havia xorrelacions molt fortes entre les diferents variables, procedim a analitzar-ho més a fons:
+
+```{r 3_3_correlacio_variables_numeriques_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
+# Generam un gràfic de correlació que ens permeti analitzar-ho fàcilment (només aquelles variables que no siguin factors):
+if (!require('corrplot')) install.packages('corrplot'); library("corrplot")
+res<-cor(dfHeartAttack[, 1:14])
+corrplot(res, method="color", tl.col="black", tl.srt=30, order = "AOE", number.cex=0.75, sig.level = 0.01, addCoef.col = "black")
+```
+
+Es confirma que no hi ha correlacions molt fortes entre ninguna de les variables que conformen el joc de dades. No obstant, existeixen algunes correlacions moderades, tant positives com negatives. 
+
+La més forta d'aquestes correspon amb una correlació negativa entre el patró de canvi de l'electrocardiograma en una situació d'estrés (variable *slp*) i el canvi en el segment ST de l'electrocardiograma (variable *oldpeak*). Mentre que la més forta amb valor positiu correspon a ula correlació entre el tipus de dolor toràcic (variable *cp*) i la probabilitat d'un atac de cor (variable *output*).
+
+Cal tenir en compte que aquestes correlacions no són molt fortes i el signe ens indica que quan una augmenta o disminueix, la variable correlacionada actúa de la mateixa manera en certa proporció segons la potència d'aquesta correlació.
+
+Amb els resultats obtinguts, no hi ha cap evidència que, per les correlacions existents, es pugui disminuïr el nombre de variables.
 
 
 # Representació dels resultats a partir de taules i gràfiques

@@ -170,6 +170,13 @@ plotbyCP <- ggplot(dfHeartAttack,aes(factor(cp, levels = c(0, 1, 2, 3), labels =
 					ggtitle("Probabilitat per dolor toràcic") +
           theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+plotbyExng <- ggplot(dfHeartAttack,aes(factor(exng, levels = c(0, 1), labels = c("No", "Sí")), fill=factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")))) + 
+					geom_bar() +labs(x="Angina provocada per exercici", y="Pacients") + 
+					guides(fill=guide_legend(title="")) + 
+				  scale_fill_manual(values=c("#008000","#800000")) + 
+					ggtitle("Probabilitat per angina provocada per exercici") +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 plotbyFBS <- ggplot(dfHeartAttack,aes(factor(fbs, levels = c(0, 1), labels = c("Normal", "Alt")), fill=factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")))) + 
 					geom_bar() +labs(x="Nivell de sucre", y="Pacients") + 
 					guides(fill=guide_legend(title="")) + 
@@ -177,23 +184,168 @@ plotbyFBS <- ggplot(dfHeartAttack,aes(factor(fbs, levels = c(0, 1), labels = c("
 					ggtitle("Probabilitat per nivell de sucre") +
           theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-# Mostrem els quatre gràfics de forma agrupada:
+plotbyTRTBPS <- ggplot(dfHeartAttack,aes(trtbps, fill=factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")))) + 
+					geom_bar() +labs(x="Pressió arterial", y="Pacients") + 
+					guides(fill=guide_legend(title="")) + 
+				  scale_fill_manual(values=c("#008000","#800000")) + 
+					ggtitle("Probabilitat per pressió arterial en repòs") +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+plotbyChol <- ggplot(dfHeartAttack,aes(chol, fill=factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")))) + 
+					geom_bar() +labs(x="Colesterol", y="Pacients") + 
+					guides(fill=guide_legend(title="")) + 
+				  scale_fill_manual(values=c("#008000","#800000")) + 
+					ggtitle("Probabilitat per colesterol") +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+plotbyRestecg <- ggplot(dfHeartAttack,aes(factor(restecg, levels = c(0, 1, 2), labels = c("Normal", "Anomalies", "Hipertròfia")), fill=factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")))) + 
+					geom_bar() +labs(x="Electrocardiograma", y="Pacients") + 
+					guides(fill=guide_legend(title="")) + 
+				  scale_fill_manual(values=c("#008000","#800000")) + 
+					ggtitle("Probabilitat per resultat de l'electrocardiograma") +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+plotbyOldpeak <- ggplot(dfHeartAttack,aes(oldpeak, fill=factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")))) + 
+					geom_bar() +labs(x="Canvis electrocardiograma", y="Pacients") + 
+					guides(fill=guide_legend(title="")) + 
+				  scale_fill_manual(values=c("#008000","#800000")) + 
+					ggtitle("Probabilitat per canvis en l'electrocardiograma") +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+plotbySLP <- ggplot(dfHeartAttack,aes(factor(slp, levels = c(0, 1, 2), labels = c("Plana", "Ascendent", "Descendent")), fill=factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")))) + 
+					geom_bar() +labs(x="Pendent", y="Pacients") + 
+					guides(fill=guide_legend(title="")) + 
+				  scale_fill_manual(values=c("#008000","#800000")) + 
+					ggtitle("Probabilitat per patró de canvi") +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+plotbyThalachh <- ggplot(dfHeartAttack,aes(thalachh, fill=factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")))) + 
+					geom_bar() +labs(x="Freqüència", y="Pacients") + 
+					guides(fill=guide_legend(title="")) + 
+				  scale_fill_manual(values=c("#008000","#800000")) + 
+					ggtitle("Probabilitat per freqüència màxima registrada") +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+plotbyCAA <- ggplot(dfHeartAttack,aes(caa, fill=factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")))) + 
+					geom_bar() +labs(x="Vasos", y="Pacients") + 
+					guides(fill=guide_legend(title="")) + 
+				  scale_fill_manual(values=c("#008000","#800000")) + 
+					ggtitle("Probabilitat per vasos sanguinis obstruïts") +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+plotbyThall <- ggplot(dfHeartAttack,aes(factor(thall, levels = c(0, 1, 2, 3), labels = c("Unknown", "Sense", "Defecte fix", "Defecte reversible")), fill=factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")))) + 
+					geom_bar() +labs(x="Indicis", y="Pacients") + 
+					guides(fill=guide_legend(title="")) + 
+				  scale_fill_manual(values=c("#008000","#800000")) + 
+					ggtitle("Probabilitat per talassèmia") +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Mostrem els diferents gràfics de forma agrupada:
 grid.newpage()
-grid.arrange(plotbyAge, plotbySex, plotbyCP, plotbyFBS, ncol=2)
+grid.arrange(plotbyAge, plotbySex, plotbyCP, plotbyExng, plotbyFBS, plotbyTRTBPS, plotbyChol, plotbyRestecg, plotbyOldpeak, ncol=3)
+
+grid.newpage()
+grid.arrange(plotbySLP, plotbyThalachh, plotbyCAA, plotbyThall, ncol=2)
 ```
+
+Observant els diversos factors que es troben dins el conjunt de dades, sembla que la variància entre els diferents valors i la seva relació amb la probabilitat de patir un atac de cor podria ser interessant mantenir tots els atributs que tenim per poder utilitzar-los durant la resta de l'anàlisi.
 
 
 # Neteja de les dades
 
 ## Valors nul·ls
 
+Comprobem si existeixen valors nul·ls en les dades, tot i que, aparentment, al revisar els resultats del resum estadístic anterior sembla que no existeixi cap valor d'aquest tipus:
+
+```{r 2_1_valors_null_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
+# Revisem el total de valors NA i blancs que hi ha a cada variable:
+colSums(is.na(dfHeartAttack))
+colSums(dfHeartAttack == "")
+```
+
+Es confirma que no existeixen valors d'aquest tipus en el conjunt de dades, pel que no serà necessari realitzar cap acció al respecte. En cas de tenir valors d'aquest tipus hauriem de pensar si treure'ls o bé realitzar una aproximació del possible valor a partir de la resta de valors de la variable en qüestió.
+
+
 ## Valors atípics
 
+En aquest cas, utilitzarem els diagrames de caixa per poder veure ràpidament si existeix algun valor atípic o outlier en el joc de dades, revisant totes les variables numèriques, no les categòriques:
+
+```{r 2_2_valors_atipics_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
+# Calculem els diferents gràfics de caixa:
+bpAge <- ggplot(data = dfHeartAttack) +
+  geom_boxplot(aes(y = age, fill = "Edat")) +
+  scale_fill_manual(values = "#008080") + 
+  ggtitle("Boxplot per edat")
+
+bpTRTBPS <- ggplot(data = dfHeartAttack) +
+  geom_boxplot(aes(y = trtbps, fill = "Pres.")) +
+  scale_fill_manual(values = "#00A595") + 
+  ggtitle("Boxplot per pressió arterial en repòs")
+
+bpChol <- ggplot(data = dfHeartAttack) +
+  geom_boxplot(aes(y = chol, fill = "Col.")) +
+  scale_fill_manual(values = "#00B080") + 
+  ggtitle("Boxplot per nivell de colesterol")
+
+bpOldpeak <- ggplot(data = dfHeartAttack) +
+  geom_boxplot(aes(y = oldpeak, fill = "Canv.")) +
+  scale_fill_manual(values = "#00C0B0") + 
+  ggtitle("Boxplot per canvis en l'electrocardiograma")
+
+bpThalachh <- ggplot(data = dfHeartAttack) +
+  geom_boxplot(aes(y = thalachh, fill = "Freq.")) +
+  scale_fill_manual(values = "#00D0A0") + 
+  ggtitle("Boxplot per freqüència màxima registrada")
+
+# Mostrem els diferents gràfics de forma agrupada:
+grid.newpage()
+grid.arrange(bpAge, bpTRTBPS, bpChol, bpOldpeak, bpThalachh, ncol=3)
+```
+
+Abans de continuar, no s'ha realitzat aquesta revisió de les variables categòriques ja que es pot comprovar en el resum estadístic que s'ha calculat inicialment que no hi ha valors fora dels vàlids. S'observen valors extrems a partir dels gràfics per algunes de les variables. No obstant, veiem que són valors que estan dintre dels paràmetres que es poden considerar com a vàlids:
+
+* Pressió arterial per sobre de 170: tot i que estigui per sobre del normal, és un valor possible i, per tant, els mantindrem dintre del joc de dades.
+* Colesterol per sobre de 400: novament ens trobem davant de valors extrems, però que es troben dins d'un rang possible, pel que mantindrem aquestes observacions dins el joc de dades a analitzar.
+* Canvis en l'electrocardiograma per sobre de 4: tot i que està fora dels valors més comuns, no està tant distanciat com per considerar treure'ls de l'anàlisi.
+* Freqüència màxima registrada per sota de 100: tot i que existeixi un valor més baix, aquest és un valor possible i, per tant, el mantindrem dins el joc de dades.
+
+En resum, no s'han trobat valors anòmals que puguin considerar-se fora dels valors possibles, tot i que sí hi ha alguns valors extrems degut a les condicions físiques i/o de salut dels diferents pacients.
+
+
 ## Normalització
+
+Comencem 
+
+
+## Discretització
+
+Afegirem alguns nous valors de forma que s'agrupin les observacions numèriques i ens permetin tenir altres variables categòriques que puguin resultar útils durant l'anàlisi:
+
+```{r 2_X_categoritzacio_variables_numeriques_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
+# Carreguem la llibreria "arules" que ens permetrà realitzar la discretització de forma automàtica
+if (!require("arules")) install.packages("arules"); library("arules")
+
+# Seleccionem la llavor per l'algoritme randomitzador:
+set.seed(1234)
+
+# Discretitzem les variables numèriques, amb clústers automàtics en diferents rangs segons el tipus de dades que contenen:
+dfHeartAttack$age_disc <- discretize(dfHeartAttack$age, "cluster", breaks = 5)
+dfHeartAttack$trtbps_disc <- discretize(dfHeartAttack$trtbps, "cluster", breaks = 3)
+dfHeartAttack$chol_disc <- discretize(dfHeartAttack$chol, "cluster", breaks = 5)
+dfHeartAttack$thalachh_disc <- discretize(dfHeartAttack$thalachh, "cluster", breaks = 3)
+
+# Mostrem els resums per comprovar que s'han realitzat les agrupacions en clústers correctament:
+summary(dfHeartAttack$age_disc)
+summary(dfHeartAttack$trtbps_disc)
+summary(dfHeartAttack$chol_disc)
+summary(dfHeartAttack$thalachh_disc)
+```
+
 
 
 # Anàlisi de les dades
 
+## Correlació de les variables
 
 
 # Representació dels resultats a partir de taules i gràfiques

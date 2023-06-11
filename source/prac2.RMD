@@ -18,45 +18,53 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
+
+# Carreguem les llibreries necessàries per realitzar els diferents gràfics que anirem generant:
+if (!require("ggplot2")) install.packages("ggplot2"); library("ggplot2")
+if (!require("ggpubr")) install.packages("ggpubr"); library("ggpubr")
+if (!require("grid")) install.packages("grid"); library("grid")
+if (!require("gridExtra")) install.packages("gridExtra"); library("gridExtra")
+if (!require("GGally")) install.packages("GGally"); library("GGally")
+
 ```
 
 *****
 
-**Descripció de la Pràctica a realitzar**
+# Descripció de la Pràctica a realitzar {.unlisted .unnumbered}
 
 L’objectiu d’aquesta activitat serà el tractament d’un dataset, que pot ser el creat a la pràctica 1 o bé qualsevol dataset lliure disponible a Kaggle (https://www.kaggle.com).
 
-Un exemple de dataset amb el qual podeu treballar és el “Heart Attack Analysis & Prediction dataset” (https://www.kaggle.com/datasets/rashikrahmanpritom/heart-attack-analysis-predictiondataset).
+Un exemple de dataset amb el qual podeu treballar és el “Heart Attack Analysis & Prediction dataset” (https://www.kaggle.com/datasets/rashikrahmanpritom/heart-attack-analysis-prediction-dataset).
 
 Important: si escolliu un dataset diferent al proposat és important que aquest contingui una àmplia varietat de dades numèriques i categòriques per poder fer una anàlisi més rica i poder respondre a les diferents preguntes plantejades a l’enunciat de la pràctica. Seguint les principals etapes d’un projecte analític, les diferents tasques a realitzar (i justificar) són les següents:
 
-1. Descripció del dataset. Perquè és important i quina pregunta/problema pretén respondre?
-2. Integració i selecció de les dades d’interès a analitzar. Pot ser el resultat d’addicionar diferents datasets o una subselecció útil de les dades originals, en base a l’objectiu que es vulgui aconseguir.
-3. Neteja de les dades.
+1. **Descripció del dataset.** Perquè és important i quina pregunta/problema pretén respondre?
+2. **Integració i selecció** de les dades d’interès a analitzar. Pot ser el resultat d’addicionar diferents datasets o una subselecció útil de les dades originals, en base a l’objectiu que es vulgui aconseguir.
+3. **Neteja de les dades.**
     3.1. Les dades contenen zeros o elements buits? Gestiona cadascun d’aquests casos.
     3.2. Identifica i gestiona els valors extrems.
-4. Anàlisi de les dades.
+4. **Anàlisi de les dades.**
     4.1. Selecció dels grups de dades que es volen analitzar/comparar (p. e., si es volen comparar grups de dades, quins són aquests grups i quins tipus d’anàlisi s’aplicaran?).
     4.2. Comprovació de la normalitat i homogeneïtat de la variància.
     4.3. Aplicació de proves estadístiques per comparar els grups de dades. En funció de les dades i de l’objectiu de l’estudi, aplicar proves de contrast d’hipòtesis, correlacions, regressions, etc. Aplicar almenys tres mètodes d’anàlisi diferents.
-5. Representació dels resultats a partir de taules i gràfiques. Aquest apartat es pot respondre al llarg de la pràctica, sense la necessitat de concentrar totes les representacions en aquest punt de la pràctica.
-6. Resolució del problema. A partir dels resultats obtinguts, quines són les conclusions? Els resultats permeten respondre al problema?
-7. Codi. Cal adjuntar el codi, preferiblement en R, amb el que s’ha realitzat la neteja, anàlisi i representació de les dades. Si ho preferiu, també podeu treballar en Python.
-8. Vídeo. Realitzar un breu vídeo explicatiu de la pràctica (màxim 10 minuts) on tots els integrants de l'equip expliquin amb les seves pròpies paraules el desenvolupament de la pràctica, basant-se en les preguntes de l'enunciat per a justificar i explicar el codi desenvolupat. Aquest vídeo s'haurà de lliurar a través d'un enllaç al Google Drive de la UOC (https://drive.google.com/…), juntament amb l’enllaç al repositori Git lliurat.
+5. **Representació dels resultats** a partir de taules i gràfiques. Aquest apartat es pot respondre al llarg de la pràctica, sense la necessitat de concentrar totes les representacions en aquest punt de la pràctica.
+6. **Resolució del problema.** A partir dels resultats obtinguts, quines són les conclusions? Els resultats permeten respondre al problema?
+7. **Codi.** Cal adjuntar el codi, preferiblement en R, amb el que s’ha realitzat la neteja, anàlisi i representació de les dades. Si ho preferiu, també podeu treballar en Python.
+8. **Vídeo.** Realitzar un breu vídeo explicatiu de la pràctica (màxim 10 minuts) on tots els integrants de l'equip expliquin amb les seves pròpies paraules el desenvolupament de la pràctica, basant-se en les preguntes de l'enunciat per a justificar i explicar el codi desenvolupat. Aquest vídeo s'haurà de lliurar a través d'un enllaç al Google Drive de la UOC (https://drive.google.com/…), juntament amb l’enllaç al repositori Git lliurat.
 
 
 *****
 
 # Descripció del dataset
 
-Inicialment s'havia pensat en aprofitar les dades recopilades durant la primera pràctica, relacionades amb dades de navegació de vaixells. No obstant, després de valorar-ho, no trobavem com poder utilitzar-lo de forma bastant gràfica i que ens permetés realitzar un estudi estadístic com el que es demana a l'enunciat, pel que finalment hem decidit utilitzar el conjunt de dades que es posa com a exemple a l'enunciat, ja que considerem que resulta molt interessant i pot donar més joc al estar relacionat amb temes de salut.
+Inicialment s'havia pensat aprofitar les dades recopilades durant la primera pràctica, relacionades amb dades de navegació de vaixells. No obstant, després de valorar-ho, no trobavem com poder utilitzar-lo de forma bastant gràfica i que ens permetés realitzar un estudi estadístic com el que es demana a l'enunciat, pel que finalment hem decidit utilitzar el conjunt de dades que es posa com a exemple a l'enunciat, ja que considerem que resulta molt interessant i pot donar més joc al estar relacionat amb temes de salut.
 
-El conjunt de dades seleccionat proporciona informació sobre diferents factors que podrien estar relacionats amb malalties cardiovasculars, més concretament amb predir la probabilitat de patir un atac de cor.
+El conjunt de dades seleccionat "[Heart Attack Analysis & Prediction dataset](https://www.kaggle.com/datasets/rashikrahmanpritom/heart-attack-analysis-prediction-dataset)" proporciona informació sobre diferents factors que podrien estar relacionats amb malalties cardiovasculars, més concretament amb predir la probabilitat de patir un atac de cor.
 
-Es tracta d'un conjunt de dades que ens permetrà realitzar un estudi en major profunditat de possibles problemes del cor, molt més centrat en els atacs de cor, al tenir una variable que està directament relacionada amb el resultat que es va obtenir durant l'estudi dels pacients i que ens ens permeti buscar un model que permeti determinar la probabilitat de patir un atac de cor per part de persones segons els valors dels diferents factors d'estudi.
+Es tracta d'un conjunt de dades que ens permetrà realitzar un estudi en major profunditat de possibles problemes del cor, molt més centrat en els atacs de cor, al tenir una variable que està directament relacionada amb el resultat que es va obtenir durant l'estudi dels pacients i que ens permeti trobar un model per determinar la probabilitat de patir un atac de cor segons els valors dels diferents factors d'estudi.
 
-Per poder facilitar aquest anàlisi, el dataset conté el fitxer *heart.csv* amb les següents variables/atributs:
+Per poder facilitar aquesta anàlisi, el dataset conté el fitxer *heart.csv* amb les següents variables/atributs:
 
 * **age**: edat del pacient
 * **sex**: gènere del pacient 
@@ -66,7 +74,7 @@ Per poder facilitar aquest anàlisi, el dataset conté el fitxer *heart.csv* amb
     * 0 = angina típica
     * 1 = angina atípica
     * 2 = dolor no relacionat amb angina
-    * 3 = asimptomàtic (sense dolor toràcic))
+    * 3 = asimptomàtic (sense dolor toràcic)
 * **trtbps**: pressió arterial en repòs (mm Hg)
 * **chol**: nivell de colesterol (md/dl)
 * **fbs**: nivell de sucre en sang en dejú
@@ -99,21 +107,22 @@ Per poder facilitar aquest anàlisi, el dataset conté el fitxer *heart.csv* amb
     * 0 = sense o poca probabilitat
     * 1 = major probabilitat
 
-Per altra banda, el fitxer *o2Saturation.csv* conté el que sem,blen múltiples observacions relacionades amb el nivell de saturació d'oxigen, però no s'ha trobat una manera de relacionar-los directament amb el fitxer anterior, ja que solament conté moltíssimes més observacions (3586 en total) sense cap tipus d'idenfificador que ens permeti poder realitzar una integració de les dades d'ambdós fitxers per tenir un conjunt més complet.
-
+Per altra banda, hi ha disponible un segon fitxer, *o2Saturation.csv*, que conté múltiples observacions relacionades amb el nivell de saturació d'oxigen (una única variable). El fitxer conté moltíssimes més observacions (3586 en total) sense cap tipus d'idenfificador que ens permeti poder realitzar una integració de les dades d'ambdós fitxers per tenir un conjunt més complet.
 
 # Integració i selecció de les dades d’interès a analitzar
 
-Abans de començar, és necessari carregar el fitxer en un data frame que ens permeti treballar de forma còmode amb les dades a través del codi en R:
+## Càrrega de dades
 
-```{r 1_1_carrega_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
+Abans de començar, és necessari carregar el fitxer en un data frame que ens permeti treballar de forma còmoda amb les dades a través del codi en R:
+
+```{r 1_1_carrega_joc_dades}
 # El joc de dades està conformat per un fitxer CSV, amb separació per comes i amb una capçalera, pel que carreguem el fitxer utilitzant la següent funció:
-dfHeartAttack <- read.csv("..\\dataset\\heart.csv", header=TRUE)
+dfHeartAttack <- read.csv("../dataset/heart.csv", header=TRUE)
 ```
 
 Una vegada carregades totes les dades, procedim a un primer anàlisi ràpid a partir del resum estadístic del data frame:
 
-```{r 1_2_estadistiques_basiques_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
+```{r 1_2_estadistiques_basiques_joc_dades}
 # Mostrem la informació bàsica del data frame per comprovar si s'han de realitzar canvis a simple vista:
 str(dfHeartAttack)
 
@@ -121,18 +130,13 @@ str(dfHeartAttack)
 summary(dfHeartAttack)
 ```
 
-Veiem que tenim un joc de dades compost per un total de 303 observacions i 14 variables. Per altra banda, a simple vista no s'observen valors que puguin ser considerats com *outliers*, tot i que ho veurem amb major detall més endavant. Per altra banda, 
+Veiem que tenim un joc de dades compost per un total de `r dim(dfHeartAttack)[1]` observacions i `r dim(dfHeartAttack)[2]` variables. 
 
-Per seleccionar aquelles variables que puguin estar més directament relacionades amb l'atac de cor, realitzem un primer anàlisi exploratori que ens permeti entendre millor el conjunt de dades:
+## Anàlisi exploratori
 
-```{r 1_3_grafic_distribucio_probabilitat_atac_cor_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
-# Carreguem les llibreries necessàries per realitzar els diferents gràfics que anirem generant:
-if (!require("ggplot2")) install.packages("ggplot2"); library("ggplot2")
-if (!require("ggpubr")) install.packages("ggpubr"); library("ggpubr")
-if (!require("grid")) install.packages("grid"); library("grid")
-if (!require("gridExtra")) install.packages("gridExtra"); library("gridExtra")
-if (!require("GGally")) install.packages("GGally"); library("GGally")
+Realitzem un primer anàlisi exploratori que ens permeti entendre millor el conjunt de dades:
 
+```{r 1_3_grafic_distribucio_probabilitat_atac_cor_joc_dades}
 # Visualitzem la quantitat d'observacions que s'han identificat amb una probabilitat més alta i més baixa que es van identificar en  referència als atacs de cor:
 ggplot(dfHeartAttack,aes(factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")), fill=factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")))) + 
     geom_bar() +labs(x="Probabilitat", y="Pacients") + 
@@ -147,9 +151,9 @@ table(dfHeartAttack$output)/length(dfHeartAttack$output)
 
 Veiem que les dades estan molt repartides entre els pacients que tenen una probabilitat major i menor de patir un atac de cor segons els factors registrats.
 
-Creem uns quants gràfics que ens permetin veure la relació entre les variables i la probabilitat de patir un atac de cor:
+Vegem la probabilitat de patir un atac de cor en base a les diferents variables:
 
-```{r 1_4_grafics_distribuciovariables_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
+```{r 1_4_grafics_distribuciovariables_joc_dades, fig.height = 16}
 plotbyAge <- ggplot(dfHeartAttack,aes(age, fill=factor(output, levels = c(0, 1), labels = c("Baixa", "Alta")))) + 
 					geom_bar() +labs(x="Edat", y="Pacients") + 
 					guides(fill=guide_legend(title="")) +
@@ -241,17 +245,14 @@ plotbyThall <- ggplot(dfHeartAttack,aes(factor(thall, levels = c(0, 1, 2, 3), la
 					ggtitle("Probabilitat per talassèmia") +
           theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-# Mostrem els diferents gràfics de forma agrupada:
 grid.newpage()
-grid.arrange(plotbyAge, plotbySex, plotbyCP, plotbyExng, plotbyFBS, plotbyTRTBPS, plotbyChol, plotbyRestecg, plotbyOldpeak, ncol=3)
+grid.arrange(plotbyAge, plotbySex, plotbyCP, plotbyExng, plotbyFBS, plotbyTRTBPS, plotbyChol, plotbyRestecg, plotbyOldpeak, plotbySLP, plotbyThalachh, plotbyCAA, plotbyThall, ncol=2)
 
-grid.newpage()
-grid.arrange(plotbySLP, plotbyThalachh, plotbyCAA, plotbyThall, ncol=2)
 ```
 
 Finalment, creem un gràfic on es mostrin les possibles relacions existentes entre les variables per veure, de forma ràpida, si podem veure algunes correlacions de forma directa:
 
-```{r 1_5_grafic_dispersio_variables_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
+```{r 1_5_grafic_dispersio_variables_joc_dades, fig.width=13, fig.height = 13}
 # Generem un gràfic que compara parells de variables entre elles, el que ens permet
 ggpairs(data = dfHeartAttack, columns = 1:13)
 ```
@@ -265,7 +266,7 @@ Observant els diversos factors que es troben dins el conjunt de dades i tots els
 
 Comprobem si existeixen valors nul·ls en les dades, tot i que, aparentment, al revisar els resultats del resum estadístic anterior sembla que no existeixi cap valor d'aquest tipus:
 
-```{r 2_1_valors_null_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
+```{r 2_1_valors_null_joc_dades}
 # Revisem el total de valors NA i blancs que hi ha a cada variable:
 colSums(is.na(dfHeartAttack))
 colSums(dfHeartAttack == "")

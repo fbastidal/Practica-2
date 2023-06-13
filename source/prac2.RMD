@@ -26,6 +26,19 @@ if (!require("ggpubr")) install.packages("ggpubr"); library("ggpubr")
 if (!require("grid")) install.packages("grid"); library("grid")
 if (!require("gridExtra")) install.packages("gridExtra"); library("gridExtra")
 if (!require("GGally")) install.packages("GGally"); library("GGally")
+# Carreguem la llibreria "arules" que ens permetrà realitzar la discretització de forma automàtica
+if (!require("arules")) install.packages("arules"); library("arules")
+if (!require("skimr")) install.packages("skimr"); library("skimr")
+if (!require('corrplot')) install.packages('corrplot'); library("corrplot")
+if (!require('dplyr')) install.packages('dplyr'); library("dplyr")
+
+if (!require('cluster')) install.packages('cluster'); library(cluster)
+if (!require('fpc')) install.packages('fpc'); library('fpc')
+
+if(!require('gmodels')) install.packages('gmodels', repos='http://cran.us.r-project.org'); library('gmodels')
+if (!require('randomForest')) install.packages("randomForest"); library('randomForest')
+if (!require(pROC)) install.packages("pROC"); library(pROC)
+
 
 ```
 
@@ -123,11 +136,11 @@ dfHeartAttack <- read.csv("../dataset/heart.csv", header=TRUE)
 Una vegada carregades totes les dades, procedim a un primer anàlisi ràpid a partir del resum estadístic del data frame:
 
 ```{r 1_2_estadistiques_basiques_joc_dades}
-# Mostrem la informació bàsica del data frame per comprovar si s'han de realitzar canvis a simple vista:
+# Mostrem la informació bàsica del data frame per fer una comprovació a simple vista:
 str(dfHeartAttack)
 
-# Mostrem també un resum estadístic de les variables/atributs que conformen el joc de dades:
-summary(dfHeartAttack)
+# Mostrem també un resum estadístic de les variables del joc de dades:
+skim(dfHeartAttack)
 ```
 
 Veiem que tenim un joc de dades compost per un total de `r dim(dfHeartAttack)[1]` observacions i `r dim(dfHeartAttack)[2]` variables. 
@@ -259,6 +272,11 @@ ggpairs(data = dfHeartAttack, columns = 1:13)
 
 Observant els diversos factors que es troben dins el conjunt de dades i tots els gràfics creats, sembla que la variància entre els diferents valors, així com la, a priori, poca correlació entre les variables i la seva relació amb la probabilitat de patir un atac de cor podria ser interessant mantenir tots els atributs que tenim per poder utilitzar-los durant la resta de l'anàlisi.
 
+## Integració, selecció i reducció de dades
+
+La **integració** consisteix en la combinació de dades de diferents fonts, per tal de crear una estructura de dades coherent. En el cas d'estudi, aquesta integració ja està realitzada i tenim, de cada observació, totes les variables en columnes.
+
+La **selecció** consisteix en filtrar o seleccionar les dades d'interès. A partir de l'anàlisi exploratori que hem realitzat consideram vàlides totes les dades i no cal filtrar ni reduir la dimensionalitat del dataset.
 
 # Neteja de les dades
 
@@ -277,9 +295,11 @@ Es confirma que no existeixen valors d'aquest tipus en el conjunt de dades, pel 
 
 ## Valors atípics
 
-En aquest cas, utilitzarem els diagrames de caixa per poder veure ràpidament si existeix algun valor atípic o outlier en el joc de dades, revisant totes les variables numèriques, no les categòriques:
+Respecte a les variables categòriques,  podem comprovar en el resum estadístic que no hi ha cap valor fora del rang vàlid; per tant no tenen valors atípics.
 
-```{r 2_2_valors_atipics_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
+Respecte a les variables numèriques, utilitzarem els diagrames de caixa per poder veure ràpidament si existeix algun valor atípic o *outlier* en el joc de dades:
+
+```{r 2_2_valors_atipics_joc_dades}
 # Calculem els diferents gràfics de caixa:
 bpAge <- ggplot(data = dfHeartAttack) +
   geom_boxplot(aes(y = age, fill = "Edat")) +
@@ -311,49 +331,87 @@ grid.newpage()
 grid.arrange(bpAge, bpTRTBPS, bpChol, bpOldpeak, bpThalachh, ncol=3)
 ```
 
-Abans de continuar, no s'ha realitzat aquesta revisió de les variables categòriques ja que es pot comprovar en el resum estadístic que s'ha calculat inicialment que no hi ha valors fora dels vàlids. S'observen valors extrems a partir dels gràfics per algunes de les variables. No obstant, veiem que són valors que estan dintre dels paràmetres que es poden considerar com a vàlids:
+S'observen valors extrems a partir dels gràfics per algunes de les variables. No obstant, veiem que són valors que estan dintre dels paràmetres que es poden considerar com a vàlids:
 
 * Pressió arterial per sobre de 170: tot i que estigui per sobre del normal, és un valor possible i, per tant, els mantindrem dintre del joc de dades.
 * Colesterol per sobre de 400: novament ens trobem davant de valors extrems, però que es troben dins d'un rang possible, pel que mantindrem aquestes observacions dins el joc de dades a analitzar.
 * Canvis en l'electrocardiograma per sobre de 4: tot i que està fora dels valors més comuns, no està tant distanciat com per considerar treure'ls de l'anàlisi.
 * Freqüència màxima registrada per sota de 100: tot i que existeixi un valor més baix, aquest és un valor possible i, per tant, el mantindrem dins el joc de dades.
 
-En resum, no s'han trobat valors anòmals que puguin considerar-se fora dels valors possibles, tot i que sí hi ha alguns valors extrems degut a les condicions físiques i/o de salut dels diferents pacients.
+En resum, no s'han trobat valors anòmals que puguin considerar-se fora dels valors possibles, tot i que sí hi ha alguns valors extrems degut a les condicions físiques i/o de salut dels diferents pacients. Possiblement aquests valors poden ser importants a l'hora de fer estimacions. No procedeix eliminar cap valor atípic.
 
 
-## Normalització
+## Normalització i discretització
 
-La normalització de les dades ens permet obtenir valors en escales que permetin comparar la magnitud de forma similar entre els diferents rangs de valors que tenen les variables. Tot i que podriem portar a terme aquest procés, no es considera útil en el nostre cas, ja que no ens permetria entendre de forma ràpida els resultats dels anàlisis per exemple si es busca els resultats per algú d'una edat específica, sent necessari un càlcul previ per aplicar la mateixa escala.
+La normalització de les dades ens permet obtenir valors en escales que permetin comparar la magnitud de forma similar entre els diferents rangs de valors que tenen les variables.
 
-Per tant, s'ha decidit no normalitzar les observacions del joc de dades, tot i que seria possible si es volgués millorar una mica el rendiment al utilitzar un conjunt de dades que fos molt més gran que el que ens ocupa.
+Per altra banda, la discretització ens permet agrupar observacions numèriques per tenir noves categories que puguin resultar útils durant l'anàlisi (per exemple en algorismes de classificació d'arbre):
 
-
-## Discretització
-
-Afegirem alguns nous valors de forma que s'agrupin les observacions numèriques i ens permetin tenir altres variables categòriques que puguin resultar útils durant l'anàlisi:
-
-```{r 2_X_categoritzacio_variables_numeriques_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
-# Carreguem la llibreria "arules" que ens permetrà realitzar la discretització de forma automàtica
-if (!require("arules")) install.packages("arules"); library("arules")
-
+```{r Normalitzacio}
 # Seleccionem la llavor per l'algoritme randomitzador:
 set.seed(1234)
 
-# Discretitzem les variables numèriques, amb clústers automàtics en diferents rangs segons el tipus de dades que contenen:
-dfHeartAttack$age_disc <- discretize(dfHeartAttack$age, "cluster", breaks = 5)
-dfHeartAttack$trtbps_disc <- discretize(dfHeartAttack$trtbps, "cluster", breaks = 3)
-dfHeartAttack$chol_disc <- discretize(dfHeartAttack$chol, "cluster", breaks = 5)
-dfHeartAttack$thalachh_disc <- discretize(dfHeartAttack$thalachh, "cluster", breaks = 3)
+# data frame Heart Attack Normalitzat (dfHAN)
+dfHAN <- dfHeartAttack %>% 
+  mutate( # Discretització
+          age.d = discretize(age, "cluster", breaks = 5),
+          trtbps.d = discretize(trtbps, "cluster", breaks = 3),
+          chol.d = discretize(chol, "cluster", breaks = 5),
+          thalachh.d = discretize(thalachh, "cluster", breaks = 3),
+          #  Normalització
+          age = scale( age, center=TRUE, scale=TRUE )[,1],
+          sex = factor( ifelse( sex==1, "Masculí", 
+                          ifelse( sex==0, "Femení", "?"))),
+          cp = factor( ifelse( cp==0, "Angina típica",
+                         ifelse( cp==1, "Angina atípica",
+                         ifelse( cp==2, "Dolor no relacionat amb angina",
+                         ifelse( cp==3, "Sense dolor toràcic", "?"))))),
+          trtbps = scale( trtbps, center=TRUE, scale=TRUE )[,1],
+          chol = scale( chol, center=TRUE, scale=TRUE )[,1],
+          fbs = factor( ifelse( fbs==0, "Normal",
+                          ifelse( fbs==1, "Alt", "?"))),
+          restecg = factor( ifelse( restecg==0, "Normal",
+                            ifelse( restecg==1, "Anomalies ST-T",
+                            ifelse( restecg==2, "Hipertrofia ventricular", "?")))),
+          thalachh = scale( thalachh, center=TRUE, scale=TRUE )[,1],
+          exng = factor( ifelse( exng==0, "No exercici",
+                         ifelse( exng==1, "Si exercici", "?"))),
+          oldpeak = scale( oldpeak, center=TRUE, scale=TRUE )[,1],
+          slp = factor( ifelse( slp==0, "Pendent plana",
+                        ifelse( slp==1, "Pendent ascendent",
+                        ifelse( slp==2, "Pendent descendent", "?")))),
+          caa = factor( ifelse( caa==0, "Sense obstrucció",
+                        ifelse( caa==1, "Obstrucció en un vas",
+                        ifelse( caa==2, "Obstrucció de dos vasos",
+                        ifelse( caa==3, "Obstrucció de tres vasos",
+                        ifelse( caa==4, "Obstrucció de quatre vasos", "?")))))),
+          thall = factor( ifelse( thall==1, "No hi ha antecedents",
+                          ifelse( thall==2, "Presència defecte fix",
+                          ifelse( thall==3, "Presència de defecte reversible", "?")))),
+          resultat = factor( ifelse( output==0, "Atac probable",
+                             ifelse( output==1, "Atac poc probable", "?"))))
 
-# Mostrem els resums per comprovar que s'han realitzat les agrupacions en clústers correctament:
-summary(dfHeartAttack$age_disc)
-summary(dfHeartAttack$trtbps_disc)
-summary(dfHeartAttack$chol_disc)
-summary(dfHeartAttack$thalachh_disc)
+dfHANnum <- dfHAN %>% 
+  select(age, trtbps, chol, thalachh, oldpeak )
+
+dfHANcat <- dfHAN %>% 
+  select(age.d, trtbps.d, chol.d, thalachh.d, sex, cp, fbs, restecg, exng, slp, caa, thall, resultat)
+
+skim(dfHAN)
+
 ```
 
-Observem
+## Anàlisi de components principals
 
+Una possible forma de reduir-ne la dimensionalitat és considerar els components principals de les variables numériques:
+
+```{r components_principals}
+
+pca.acc <- prcomp(dfHANnum, scale. = TRUE)
+
+summary( pca.acc )
+```
+Podem veure que partim de cinc variables i necessitam quatre per arribar a descriure el 90% de la variabilitat total, per la qual cosa no suposa una gran reducció de dimensionalitat.
 
 # Anàlisi de les dades
 
@@ -363,44 +421,41 @@ Per facilitar els càlculs futurs, es procedirà a un anàlisi de la normalitat 
 
 Comencem amb un test de Shapiro-Wilk de normalitat:
 
-```{r 3_1_test_normalitat_variables_numeriques_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
-# Realitzem el test de normalitat Shapiro-Wilk a les diferents variables:
-shapiro.test(dfHeartAttack$age)
-shapiro.test(dfHeartAttack$trtbps)
-shapiro.test(dfHeartAttack$chol)
-shapiro.test(dfHeartAttack$oldpeak)
-shapiro.test(dfHeartAttack$thalachh)
+```{r 3_1_test_normalitat_variables_numeriques_joc_dades}
+# Realitzem el test de normalitat Shapiro-Wilk a les diferents variables numériques
+
+apply( dfHANnum, 2, shapiro.test )
 ```
 
 Tots els test mostren que les variables no segueixen una distribució totalment normal. No obstant, pel *Teorema del Límit Central*, al tractar-se d'una quantitat elevada d'observacions, es pot considerar que tendeixen a una distribució normal. Per corroborar aquest punt, generem els gràfics QQ per veure si la tendència és normal o no:
 
 ```{r 3_2_grafic_qq_variables_numeriques_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
 # Creem els diferents gràfics QQ per comprovar si les dades de les variables segueixen o s'aproximen a una distribució normal:
-qqAge <- ggplot(data = dfHeartAttack, aes(sample = age)) +
+qqAge <- ggplot(data = dfHAN, aes(sample = age)) +
   geom_qq() +
   geom_qq_line() +
   labs(x = "Valors teòrics", y = "Valors observats") +
   ggtitle("Gràfic QQnorm: 'age'")
 
-qqTRTBPS <- ggplot(data = dfHeartAttack, aes(sample = trtbps)) +
+qqTRTBPS <- ggplot(data = dfHAN, aes(sample = trtbps)) +
   geom_qq() +
   geom_qq_line() +
   labs(x = "Valors teòrics", y = "Valors observats") +
   ggtitle("Gràfic QQnorm: 'trtbps'")
 
-qqChol <- ggplot(data = dfHeartAttack, aes(sample = chol)) +
+qqChol <- ggplot(data = dfHAN, aes(sample = chol)) +
   geom_qq() +
   geom_qq_line() +
   labs(x = "Valors teòrics", y = "Valors observats") +
   ggtitle("Gràfic QQnorm: 'chol'")
 
-qqOldpeak <- ggplot(data = dfHeartAttack, aes(sample = oldpeak)) +
+qqOldpeak <- ggplot(data = dfHAN, aes(sample = oldpeak)) +
   geom_qq() +
   geom_qq_line() +
   labs(x = "Valors teòrics", y = "Valors observats") +
   ggtitle("Gràfic QQnorm: 'oldpeak'")
 
-qqThalachh <- ggplot(data = dfHeartAttack, aes(sample = thalachh)) +
+qqThalachh <- ggplot(data = dfHAN, aes(sample = thalachh)) +
   geom_qq() +
   geom_qq_line() +
   labs(x = "Valors teòrics", y = "Valors observats") +
@@ -416,28 +471,292 @@ Amb els resultats obtinguts, podem observar que les variables numèriques, tot i
 
 ## Correlació de les variables
 
-Tot i que ja s'ha vist anteriorment que semblava que no hi havia xorrelacions molt fortes entre les diferents variables, procedim a analitzar-ho més a fons:
+Tot i que ja s'ha vist anteriorment que semblava que no hi havia correlacions molt fortes entre les diferents variables, procedim a analitzar-ho més a fons:
 
-```{r 3_3_correlacio_variables_numeriques_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
+```{r 3_3_correlacio_variables_numeriques_joc_dades }
 # Generam un gràfic de correlació que ens permeti analitzar-ho fàcilment (només aquelles variables que no siguin factors):
-if (!require('corrplot')) install.packages('corrplot'); library("corrplot")
 res<-cor(dfHeartAttack[, 1:14])
 corrplot(res, method="color", tl.col="black", tl.srt=30, order = "AOE", number.cex=0.75, sig.level = 0.01, addCoef.col = "black")
 ```
-
-Es confirma que no hi ha correlacions molt fortes entre ninguna de les variables que conformen el joc de dades. No obstant, existeixen algunes correlacions moderades, tant positives com negatives. 
 
 La més forta d'aquestes correspon amb una correlació negativa entre el patró de canvi de l'electrocardiograma en una situació d'estrés (variable *slp*) i el canvi en el segment ST de l'electrocardiograma (variable *oldpeak*). Mentre que la més forta amb valor positiu correspon a ula correlació entre el tipus de dolor toràcic (variable *cp*) i la probabilitat d'un atac de cor (variable *output*).
 
 Cal tenir en compte que aquestes correlacions no són molt fortes i el signe ens indica que quan una augmenta o disminueix, la variable correlacionada actúa de la mateixa manera en certa proporció segons la potència d'aquesta correlació.
 
+Podem fer la correlació únicament sobre les variables numériques:
+
+```{r 3_3_correlacio_variables_numeriques_joc_dades_2 }
+# Generam un gràfic de correlació que ens permeti analitzar-ho fàcilment (només aquelles variables que no siguin factors):
+res <- cor( dfHANnum )
+corrplot(res, method="color", tl.col="black", tl.srt=30, order = "AOE", number.cex=0.75, sig.level = 0.01, addCoef.col = "black")
+```
+
 Amb els resultats obtinguts, no hi ha cap evidència que, per les correlacions existents, es pugui disminuïr el nombre de variables.
 
+## Regressió logística
 
-# Representació dels resultats a partir de taules i gràfiques
+La regresió logística és un model que intentar predir el resultat (`output`) a partir de la resta de variabels mitjançant un model de regressió estadística.
 
+
+```{r}
+regressio <- lm(output ~ age + sex + cp + trtbps + chol + fbs + restecg + thalachh + exng + oldpeak + slp + caa + thall, data = dfHAN)
+summary(regressio)
+```
+
+Podem veure que amb la regressió múltiple $R^2=`r summary(regressio)$adj.r.squared`$, que ens indica que, amb aquest model, tot el conjunt de variables disponibles expliquen el `r round(100*summary(regressio)$adj.r.squared, 2)`% de la variable objetivo `output`.
+
+
+## Test d'hipòtesi
+
+Ens demanam si les dones tenen major probabilitat de tenir un ataca de cor que els dones. Podem veure la gràfica comparativa per gènere:
+
+```{r}
+plotbySex
+```
+
+En la mostra hi ha un percentatge major de dones amb alta probabilitat de tenir un atac de cor que d'homes; però ens demanam si aquesta diferència és significativa ja que podria ser fruït de l'atzar de la mostra.
+
+### Hipòtesi
+
+La hipòtesi nul·la, o $H_{0}$ és: **La probabilitat de tenir un atac de cor de les dones és igual a la probabilitat de tenir un atac de cor dels homes**
+
+La hipòtesi alternativa, o $H_{1}$ és: **La probabilitat de tenir un atac de cor de les dones és superior a la probabilitat de tenir un atac de cor dels homes**
+
+### Contrast
+
+Es tracta d'un test de contraste unilateral sobre dues mostres (les probabilitats de tenir atac de cor de les dones i les dels homes) en relació a les seves probabilitats de tenir un atac de cor.
+
+Per determinar el test a aplicar, és pertinent aplicar el teorema del límit central que estableix que el contrast d'hipòtesi sobre una mitjana d'una mostra s'aproxima a una distribució normal encara que la població original no segueixi una distribució normal, sempre que la mida de la mostra sigui suficientment gran (superior a 30). Això ja ho hem vist en l'apartat del Test de normalitat.
+
+Perquè es puguin donar les condicions para aplicar el teorema del límit central, el tamany de les dues mostres ha de ser superior a 30; vegem-ho:
+
+```{r tamany_sexe}
+mostra_dones <- dfHAN$output[dfHAN$sex=="Femení"]
+mostra_homes <- dfHAN$output[dfHAN$sex=="Masculí"]
+print( paste("La mostra de les dones és de", length(mostra_dones), "observacions") )
+print( paste("La mostra dels homes és de", length(mostra_homes), "observacions") )
+```
+
+Podem veure que les dues mostres compleixen les hipòtesis del teorema del límit central i, per tant podem assumir que segueixen lleis normals.
+
+Les variances de les poblacions (la població de les dones i dels homes) no les coneixem. Només tenim, òbviament, les respectives variances mostrals. A continuació, necessitam saber si les variances de les dues poblacions són iguales o no, Per això cal fer un **test d'homoscedasticitat**:
+
+Assumim (per l'argument anterior) que les dues mostres correponen a dues poblacions normals independents $N(\mu_{1},\sigma_{1})$ i $N(\mu_{2},\sigma_{2})$. Aleshores la variable aleatòria següent segueix una distribució F d'Snedecor amb $n_1-1$ i $n_2-1$ graus de llibertat:
+$$ F=\frac{\frac{s_{1}^{2}}{\sigma_{1}^{2}}}{\frac{s_{2}^{2}}{\sigma_{2}^{2}}}  $$
+
+On $s_1$ i $s_2$ són les desviacions estàndards mostrals i $\sigma_{1}$ i $\sigma_{2}$ les desviacions poblacionals.
+
+Sota la hipòtesi nul·la $H_{0}: \sigma_{1}^{2}=\sigma_{2}^{2}$, el test estadístic és:
+$$ f_{obs}=\frac{s_{1}^{2}}{s_{2}^{2}}\sim F_{n_{1}-1,n_{2}-1}  $$
+On F és una distribució d'Snedecor amb $n_1-1$ i $n_2-1$ graus de llibertat.
+
+La hipòtesi alternativa $H_{1}: \sigma_{1}^{2}\neq \sigma_{2}^{2}$
+
+Facem el càlcul en R:
+
+```{r validar_homoscedasticitat}
+var.test( mostra_dones, mostra_homes)
+```
+
+Podem veure que el valor de l'estadístic cau en la zona d'acceptació de l'hipòtesi nul·la. De fet, obtenim un valor de *p* superior a $\alpha$ i, per tant, no podem rebutjar la hipòtesi nul·la. Per tant, les variances poblacionals són essencialment iguales.
+
+En resum, el test a aplicar és el corresponent a dues mostres independents corresponents a poblacions que se poden aproximar a una llei normal, sobre la mitjana amb variances desconegudes però iguales.
+
+### Càlculs
+
+El test estadístic de la diferència de les dues mitjanes segueix una distribució t d'Student amb $n_{1}+n_{2}-2$ graus de llibertat:
+$$ t=\frac{\bar{x}_{1}-\bar{x}_{2}}{S\sqrt{\frac{1}{n_{1}}+\frac{1}{n_{2}}}}\sim  t_{n_{1}+n_{2}-2} $$
+
+El valor *S* és la desviació típica comuna que es calcula com:
+$$ S=\sqrt{\frac{(n_1-1)S_1^2+(n_2-1)S_2^2}{n_1+n_2-2}} $$
+On $s_1^2$ i $s_2^2$ són les variances mostrals estimades.
+
+Sota la hipòtesi nul·la $H_0$: $P(t_{\alpha/2}\le t_{obs} \le t_{1-\alpha/2})=1-\alpha$
+
+Per tant, la zona d'acceptació és $[t_{\alpha/2},t_{1-\alpha/2}]$.
+
+Facem el càlcul en R:
+
+```{r calcul_sexe}
+alfa    <- 0.05
+# Tamany de les mostres
+nd <- length(mostra_dones)
+nh <- length(mostra_homes)
+# Mitjanes de les mostres
+md <- mean(mostra_dones)
+mh <- mean(mostra_homes)
+# Desviació estàndard de les mostres
+sd <- sd(mostra_dones)
+sh <- sd(mostra_homes)
+
+# Valor de l'estadístic
+S    <- sqrt( ( (nd-1)*sd^2 + (nh-1)*sh^2 ) / (nd+nh-2) )
+tobs <- (md-mh)/(S*sqrt( 1/nd + 1/nh ))
+# Valors crítics
+tcrit.L <- qt( alfa/2, df=nd+nh-2)
+tcrit.U <- qt( alfa/2, df=nd+nh-2, lower.tail=FALSE)
+# Valor de p
+valor_p <- pt( abs(tobs), df=nd+nh-2, lower.tail=FALSE)*2
+print(paste("Valor observat:", round(tobs,2)))
+print(paste("Interval d'acceptació: [",round(tcrit.L, 2),",", round(tcrit.U, 2), "]"))
+print(paste("Valor de p:", round(valor_p, 2)))
+```
+
+### Interpretació
+
+Podem veure que l'observació de l'estadístic considerat és `r round(tobs,2)`, valor que cau fora la zona d'acceptació: [`r round(tcrit.L, 2)`, `r round(tcrit.U, 2)`]. Per tant podem rebutjar la hipòtesi nul·la amb un nivell de confiança del 95%.
+
+El valor de p (probabilitat de l'error que s'estaria cometent si es rebutja la hipòtesi nul·la essent aquesta certa) és de `r round(valor_p, 2)`. Un valor inferior a $\alpha$.
+
+Com a conseqüència, hem de rebutjar la hipòtesi nul·la a favor de l'alternativa: **La probabilitat de tenir un atac de cor de les dones és superior a la probabilitat de tenir un atac de cor dels homes**
+
+## Model no supervisat
+
+Anem a generar un model no supervisat basat en l'algorisme *k_means*. El paràmetre fundamental és el valor de k, que coincideix amb el nombre de grups que volem trobar. En realitat en el nostre problema volem classificar les observacions en dos grups: els que tenen risc d'atac de cor i els que no; per tant, el valor que ens interessa és k=2; però abans analitzarem quin és el valor de k amb el que podem obtenir uns clústers més diferenciats:
+
+**Estimació del millor valor de k pel mètode Calinski-Harabasz**
+
+```{r message= FALSE, warning=FALSE}
+
+
+fit_ch  <- kmeansruns(dfHANnum, krange = 1:10, criterion = "ch") 
+fit_asw <- kmeansruns(dfHANnum, krange = 1:10, criterion = "asw") 
+
+fit_ch$bestk
+fit_asw$bestk
+
+plot(1:10,fit_ch$crit,type="o",col="blue",pch=0,xlab="Número de clústers",ylab="Criteri Calinski-Harabasz")
+plot(1:10,fit_asw$crit,type="o",col="blue",pch=0,xlab="Número de clústers",ylab="Criteri silueta mitja")
+
+```
+
+Podem veure que el millor valor de k és 2, per tant, facem una clusterització en 2 grups i analitzem la qualitat. Per poder visualitzar el resultat, ho projectarem sobre les dues primeres components principals:
+
+```{r message= FALSE, warning=FALSE}
+
+d <- daisy(dfHANnum)
+millor_qualitat <- 0
+for (j in 1:50) {
+  fit <- kmeans(dfHANnum, 2)
+  y_cluster <- fit$cluster
+  sk <- silhouette(y_cluster, d)
+  qualitat <- mean(sk[,3])
+  if (qualitat>millor_qualitat) {
+    millor_qualitat <- qualitat
+    millor_fit <- fit
+  }
+}
+fit2       <- millor_fit
+y_cluster2 <- fit2$cluster
+
+clusplot(dfHANnum, fit2$cluster,
+         color=TRUE, shade=TRUE, labels=5, lines=0)
+
+sk2 <- silhouette(y_cluster2, d)
+qualitat2 <- mean(sk2[,3])
+
+qualitat2
+```
+
+
+La qualitat de la clusterització segons la silueta és `r qualitat2`; un valor molt baix. Visualment no s'aprecia una clara separació dels dos grups.
+
+Comparem els dos grups trobats amb la variable `output`:
+
+```{r message= FALSE, warning=FALSE}
+
+resultat1 <- matrix( rep(0,4), nrow=2, ncol = 2,
+            dimnames=list( c("Grup 1", "Grup 2"),
+                           c("Atac probable", "Atac poc probable")))
+
+for (i in 1:nrow(dfHANnum)) {
+ resultat1[fit2$cluster[i],dfHAN$output[i]+1] <- resultat1[fit2$cluster[i],dfHAN$output[i]+1] + 1
+}
+
+total <- sum(resultat1)
+
+opc1 <- round(100 * (resultat1["Grup 1", "Atac probable"] + resultat1["Grup 2", "Atac poc probable"] ) / total, 1)
+opc2 <- round( 100 * (resultat1["Grup 1", "Atac poc probable"] + resultat1["Grup 2", "Atac probable"] ) / total, 1)
+millor_opc <- max( opc1, opc2)
+resultat1
+print(paste("Si Grup 1 = Atac probable llavors, percentatge encert:", opc1 ))
+print(paste("Si Grup 1 = Atac poc probable llavors, percentatge encert:", opc2))
+
+```
+
+Podem veure que la millor opció d'interpretació dels resultats dels dos grups ens dóna un percentatge d'encert de `r millor_opc`%.
+
+**Conclusió:**
+
+Els dos grups trobats considerats com a clústers no estan gens separats en distància. De fet si calculam la mesura de la silueta sobre la classificació coneguda, obtenim una qualitat molt baixa de `r qualitat`. L'algorismes de clusterització només encerta en un `r millor_opc`% dels casos amb la classificació real.
+
+## Model supervisat
+
+Ara aplicarem un model supervisat basat en la generació de regles de classificació a partir d'un arbre de decisions. Farem servir les dades categòriques amb la discretització de les variables numériques; però abans hem de separar el data set en dos: un per entrenar l'algorisme i l'altre per validar-ho. Farem servir la proporció habitual de 2/3 per entrenament i 1/3 per test.
+
+```{r}
+
+indexes = 1:(nrow(dfHAN)/3) * 3 - 2
+
+train <- dfHANcat[indexes,]
+test <- dfHANcat[-indexes,]
+testY <- dfHAN[-indexes,14]
+```
+
+Una vegada feta la separació aleatòria de les mostres, convé realitzar una mínima anàlisi de dades  per a assegurar-nos de no obtenir classificadors esbiaixats pels valors que conté cada mostra. En aquest cas, verificarem que la proporció del prèstecs bons i dolents és més o menys constant en els dos conjunts:
+
+```{r}
+
+bons_tr <- ( train %>%
+             filter( resultat == "Atac probable") %>%
+             nrow() )
+      
+
+num_tr <- train %>% nrow()
+
+percen_tr <- round((bons_tr / num_tr)*100, digits=1)
+
+bons_ts <- ( test %>%
+             filter( resultat == "Atac probable") %>%
+             nrow() )
+
+num_ts <- test %>% nrow()
+
+percen_ts <- round((bons_ts / num_ts)*100, digits=1)
+
+```
+
+Es pot veure que els percentatges de probabilitat d'atacs de cor del conjunt d'entrenament i del conjunt de test són semblants (`r percen_tr`% i `r percen_ts`% respectivament). Per tant, consideram correctes els jocs d'entrenament i el de test.
+
+
+Anem a generar el model de regles de decisió per determinar si la probabilitat d'atac de cor és o no alta. Ho farem amb l¡'algorisme *random Forest*, tècnica en què genera diversos classificadors amb els seus arbres de decisió per, finalment, registrar-ne tots els resultats i determinar-ne la classe final.
+
+```{r}
+rf <- randomForest(resultat ~ ., data=train)
+print(rf)
+
+```
+
+Validem el model amb el joc de test:
+
+```{r}
+pred = predict(rf, newdata=test[1:12])
+cm = table(test[,13], pred)
+
+precisio_model <- round( 100 * sum(diag(cm)) / sum(cm), digits = 2 )
+print(sprintf("La precisión del árbol es: %.1f %%", precisio_model))
+
+```
+
+Podem veure que obtenim un model de decisió d'arbre amb una taxa de predicció del (`r precisio_model`%).
+
+Vegem la taula de confusió:
+
+```{r}
+CrossTable(test[,13], pred, prop.chisq  = FALSE, prop.c = FALSE, prop.r =TRUE,dnn = c('Reality', 'Prediction'))
+```
 
 
 # Resolució del problema
 
-
+El problema esencialment consisteix en intentar predir la probabilitat de patir un atac de cor (variable *output*) a partir de la resta de variables. Per això hem construït diferents models mesurant la qualitat de cada un d'ells. De les diferents opcions considerades, la que millor resultats ens ha donat és l'algorisme de classificació supervisat *randomForest* amb una  taxa de predicció del `r precisio_model`%.

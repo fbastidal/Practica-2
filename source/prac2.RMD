@@ -759,4 +759,19 @@ CrossTable(test[,13], pred, prop.chisq  = FALSE, prop.c = FALSE, prop.r =TRUE,dn
 
 # Resolució del problema
 
-El problema esencialment consisteix en intentar predir la probabilitat de patir un atac de cor (variable *output*) a partir de la resta de variables. Per això hem construït diferents models mesurant la qualitat de cada un d'ells. De les diferents opcions considerades, la que millor resultats ens ha donat és l'algorisme de classificació supervisat *randomForest* amb una  taxa de predicció del `r precisio_model`%.
+A partir del fitxer de dades, hem fet unes tasques de preprocessament:
+
+* Anàlisi exploratori
+* Neteja de dades, on hem vist que les dades estaven molt netes i únicament hem fet una normalització i una discretització de valors.
+
+Amb les dades preprocessades, hem fet una sèrie d'anàlisi:
+
+* Una anàlisi de components principals, on hem vist que amb 4 components principals es pot explicar el 90% de la variabilitat total.
+* Un test de normalitat, que han sortir negatius; no obstant és possible aplicar el teorema del límit central perquè tenim moltes dades.
+* Un estudi de correlacions entre les variables, que ha conclos que aquestes son molt febles.
+* Una regressió logística, que ens ha permet disposar d'un model de predicció de la probabilitat d'atac de cor amb una fiabilitat del 55%.
+* Un test d'hipòtesi, que ens ha permet confirmar una diferència que s'intuïa en les gràfiques: que les dones tenen més probabilitat de tenir un atac de cor que els homes.
+* Hem aplicat un model no supervisat per clusteritzar les dades en dos grups (una vegada normalitzades les dades), i hem onbtingut un model predictiu amb un percentatge d'encerts del 71%.
+* Per últim hem obtingut un model supervisat basat en un algorisme de classificació *randomForest* amb una taxa de predicció del 80%.
+
+En definitiva, amb aquesta pràctica hem seguit les fases del cicle de vida de les dades: captura, emmagazematge, prepocessat, anàlisi, visualització i publicació.

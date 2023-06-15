@@ -23,4 +23,5 @@ URL del dataset triat: https://www.kaggle.com/datasets/rashikrahmanpritom/heart-
 
 ## Vídeo de presentació
 
-Enllaç al vídeo de presentació de la pràctica: 
+Enllaç al vídeo de presentació de la pràctica: [https://drive.google.com/file/d/17M4xRM3fHLgivtAlr40ySyCwUZot0hxL/view](https://drive.google.com/file/d/17M4xRM3fHLgivtAlr40ySyCwUZot0hxL/view)
+

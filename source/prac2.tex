@@ -5,16 +5,19 @@
 \documentclass[
 ]{article}
 \usepackage{amsmath,amssymb}
-\usepackage{lmodern}
 \usepackage{iftex}
 \ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
 \else % if luatex or xetex
-  \usepackage{unicode-math}
+  \usepackage{unicode-math} % this also loads fontspec
   \defaultfontfeatures{Scale=MatchLowercase}
   \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
 \fi
 % Use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
@@ -74,6 +77,16 @@
 \newcommand{\VariableTok}[1]{\textcolor[rgb]{0.80,0.80,0.80}{#1}}
 \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.80,0.58,0.58}{#1}}
 \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.50,0.62,0.50}{\textbf{#1}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
 \usepackage{graphicx}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
@@ -96,7 +109,7 @@
 \fi
 \IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\urlstyle{same} % disable monospaced font for URLs
+\urlstyle{same}
 \hypersetup{
   pdftitle={M2.951 - Tipologia i cicle de vida de les dades},
   pdfauthor={Autors: Francisco J. Bastida López (fbastidal@uoc.edu) / Ivan Benaiges Trenchs (ibenaiges@uoc.edu)},
@@ -119,14 +132,8 @@ Benaiges Trenchs
 }
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
-\hypertarget{pruxe0ctica-2-25-nota-final}{%
-\section{Pràctica 2 (25\% nota
-final)}\label{pruxe0ctica-2-25-nota-final}}
-
-\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
-
 \hypertarget{descripciuxf3-de-la-pruxe0ctica-a-realitzar}{%
-\subsection{Descripció de la Pràctica a
+\section*{Descripció de la Pràctica a
 realitzar}\label{descripciuxf3-de-la-pruxe0ctica-a-realitzar}}
 
 L'objectiu d'aquesta activitat serà el tractament d'un dataset, que pot
@@ -135,7 +142,7 @@ Kaggle (\url{https://www.kaggle.com}).
 
 Un exemple de dataset amb el qual podeu treballar és el ``Heart Attack
 Analysis \& Prediction dataset''
-(\url{https://www.kaggle.com/datasets/rashikrahmanpritom/heart-attack-analysis-predictiondataset}).
+(\url{https://www.kaggle.com/datasets/rashikrahmanpritom/heart-attack-analysis-prediction-dataset}).
 
 Important: si escolliu un dataset diferent al proposat és important que
 aquest contingui una àmplia varietat de dades numèriques i categòriques
@@ -148,41 +155,43 @@ realitzar (i justificar) són les següents:
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  Descripció del dataset. Perquè és important i quina pregunta/problema
-  pretén respondre?
+  \textbf{Descripció del dataset.} Perquè és important i quina
+  pregunta/problema pretén respondre?
 \item
-  Integració i selecció de les dades d'interès a analitzar. Pot ser el
-  resultat d'addicionar diferents datasets o una subselecció útil de les
-  dades originals, en base a l'objectiu que es vulgui aconseguir.
+  \textbf{Integració i selecció} de les dades d'interès a analitzar. Pot
+  ser el resultat d'addicionar diferents datasets o una subselecció útil
+  de les dades originals, en base a l'objectiu que es vulgui aconseguir.
 \item
-  Neteja de les dades. 3.1. Les dades contenen zeros o elements buits?
-  Gestiona cadascun d'aquests casos. 3.2. Identifica i gestiona els
-  valors extrems.
+  \textbf{Neteja de les dades.} 3.1. Les dades contenen zeros o elements
+  buits? Gestiona cadascun d'aquests casos. 3.2. Identifica i gestiona
+  els valors extrems.
 \item
-  Anàlisi de les dades. 4.1. Selecció dels grups de dades que es volen
-  analitzar/comparar (p.~e., si es volen comparar grups de dades, quins
-  són aquests grups i quins tipus d'anàlisi s'aplicaran?). 4.2.
-  Comprovació de la normalitat i homogeneïtat de la variància. 4.3.
+  \textbf{Anàlisi de les dades.} 4.1. Selecció dels grups de dades que
+  es volen analitzar/comparar (p.~e., si es volen comparar grups de
+  dades, quins són aquests grups i quins tipus d'anàlisi s'aplicaran?).
+  4.2. Comprovació de la normalitat i homogeneïtat de la variància. 4.3.
   Aplicació de proves estadístiques per comparar els grups de dades. En
   funció de les dades i de l'objectiu de l'estudi, aplicar proves de
   contrast d'hipòtesis, correlacions, regressions, etc. Aplicar almenys
   tres mètodes d'anàlisi diferents.
 \item
-  Representació dels resultats a partir de taules i gràfiques. Aquest
-  apartat es pot respondre al llarg de la pràctica, sense la necessitat
-  de concentrar totes les representacions en aquest punt de la pràctica.
+  \textbf{Representació dels resultats} a partir de taules i gràfiques.
+  Aquest apartat es pot respondre al llarg de la pràctica, sense la
+  necessitat de concentrar totes les representacions en aquest punt de
+  la pràctica.
 \item
-  Resolució del problema. A partir dels resultats obtinguts, quines són
-  les conclusions? Els resultats permeten respondre al problema?
+  \textbf{Resolució del problema.} A partir dels resultats obtinguts,
+  quines són les conclusions? Els resultats permeten respondre al
+  problema?
 \item
-  Codi. Cal adjuntar el codi, preferiblement en R, amb el que s'ha
-  realitzat la neteja, anàlisi i representació de les dades. Si ho
+  \textbf{Codi.} Cal adjuntar el codi, preferiblement en R, amb el que
+  s'ha realitzat la neteja, anàlisi i representació de les dades. Si ho
   preferiu, també podeu treballar en Python.
 \item
-  Vídeo. Realitzar un breu vídeo explicatiu de la pràctica (màxim 10
-  minuts) on tots els integrants de l'equip expliquin amb les seves
-  pròpies paraules el desenvolupament de la pràctica, basant-se en les
-  preguntes de l'enunciat per a justificar i explicar el codi
+  \textbf{Vídeo.} Realitzar un breu vídeo explicatiu de la pràctica
+  (màxim 10 minuts) on tots els integrants de l'equip expliquin amb les
+  seves pròpies paraules el desenvolupament de la pràctica, basant-se en
+  les preguntes de l'enunciat per a justificar i explicar el codi
   desenvolupat. Aquest vídeo s'haurà de lliurar a través d'un enllaç al
   Google Drive de la UOC (\url{https://drive.google.com/}\ldots),
   juntament amb l'enllaç al repositori Git lliurat.
@@ -190,39 +199,1579 @@ realitzar (i justificar) són les següents:
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
-\hypertarget{exercici-1-descripciuxf3-del-dataset}{%
-\subsection{Exercici 1: Descripció del
-dataset}\label{exercici-1-descripciuxf3-del-dataset}}
+\hypertarget{descripciuxf3-del-dataset}{%
+\section{Descripció del dataset}\label{descripciuxf3-del-dataset}}
 
-\hypertarget{exercici-2-integraciuxf3-i-selecciuxf3-de-les-dades-dinteruxe8s-a-analitzar}{%
-\subsection{Exercici 2: Integració i selecció de les dades d'interès a
-analitzar}\label{exercici-2-integraciuxf3-i-selecciuxf3-de-les-dades-dinteruxe8s-a-analitzar}}
+Inicialment s'havia pensat aprofitar les dades recopilades durant la
+primera pràctica, relacionades amb dades de navegació de vaixells. No
+obstant, després de valorar-ho, no trobavem com poder utilitzar-lo de
+forma bastant gràfica i que ens permetés realitzar un estudi estadístic
+com el que es demana a l'enunciat, pel que finalment hem decidit
+utilitzar el conjunt de dades que es posa com a exemple a l'enunciat, ja
+que considerem que resulta molt interessant i pot donar més joc al estar
+relacionat amb temes de salut.
+
+El conjunt de dades seleccionat
+``\href{https://www.kaggle.com/datasets/rashikrahmanpritom/heart-attack-analysis-prediction-dataset}{Heart
+Attack Analysis \& Prediction dataset}'' proporciona informació sobre
+diferents factors que podrien estar relacionats amb malalties
+cardiovasculars, més concretament amb predir la probabilitat de patir un
+atac de cor.
+
+Es tracta d'un conjunt de dades que ens permetrà realitzar un estudi en
+major profunditat de possibles problemes del cor, molt més centrat en
+els atacs de cor, al tenir una variable que està directament relacionada
+amb el resultat que es va obtenir durant l'estudi dels pacients i que
+ens permeti trobar un model per determinar la probabilitat de patir un
+atac de cor segons els valors dels diferents factors d'estudi.
+
+Per poder facilitar aquesta anàlisi, el dataset conté el fitxer
+\emph{heart.csv} amb les següents variables/atributs:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{age}: edat del pacient
+\item
+  \textbf{sex}: gènere del pacient
+
+  \begin{itemize}
+  \tightlist
+  \item
+    0 = femení
+  \item
+    1 = masculí
+  \end{itemize}
+\item
+  \textbf{cp}: tipus de dolor toràcic que experimenta el pacient
+
+  \begin{itemize}
+  \tightlist
+  \item
+    0 = angina típica
+  \item
+    1 = angina atípica
+  \item
+    2 = dolor no relacionat amb angina
+  \item
+    3 = asimptomàtic (sense dolor toràcic)
+  \end{itemize}
+\item
+  \textbf{trtbps}: pressió arterial en repòs (mm Hg)
+\item
+  \textbf{chol}: nivell de colesterol (md/dl)
+\item
+  \textbf{fbs}: nivell de sucre en sang en dejú
+
+  \begin{itemize}
+  \tightlist
+  \item
+    0 = normal
+  \item
+    1 = alt)
+  \end{itemize}
+\item
+  \textbf{restecg}: resultat de l'electrocardiograma en repòs
+
+  \begin{itemize}
+  \tightlist
+  \item
+    0 = normal
+  \item
+    1 = anomalies en l'ona ST-T
+  \item
+    2 = hipertrofia ventricular esquerra probable o definitiva segons
+    els criteris d'Estes
+  \end{itemize}
+\item
+  \textbf{thalachh}: freqüència cardíaca màxima registrada pel pacient
+  durant les proves realitzades
+\item
+  \textbf{exng}: angina provocada per l'exercici
+
+  \begin{itemize}
+  \tightlist
+  \item
+    0 = no
+  \item
+    1 = sí
+  \end{itemize}
+\item
+  \textbf{oldpeak}: canvis en el segment ST de l'electrocardiograma
+  després de l'exercici físic
+\item
+  \textbf{slp}: patró de canvi en el segment ST de l'electrocardiograma
+  durant una prova d'esforç o situacions d'estrès
+
+  \begin{itemize}
+  \tightlist
+  \item
+    0 = pendent plana
+  \item
+    1 = pendent ascendent (canvi en el patró elèctric del cor)
+  \item
+    2 = pendent descendent (canvi en el patró elèctric del cor)
+  \end{itemize}
+\item
+  \textbf{caa}: nombre de vasos sanguinis coronaris que mostren
+  obstrucció o estenosi significativa
+
+  \begin{itemize}
+  \tightlist
+  \item
+    0 = sense obstrucció detectada
+  \item
+    1 = obstrucció en un dels vasos sanguinis
+  \item
+    2 = obstrucció en dos dels vasos sanguinis
+  \item
+    3 = obstrucció en tres dels vasos sanguinis
+  \item
+    4 = obstrucció en els quatre vasos sanguinis
+  \end{itemize}
+\item
+  \textbf{thall}: relacionat amb una malaltia hereditària de la sang
+  anomenada talassèmia
+
+  \begin{itemize}
+  \tightlist
+  \item
+    1 = no s'ha detectat cap indici
+  \item
+    2 = presència d'un defecte fix
+  \item
+    3 = presència d'un defecte reversible
+  \end{itemize}
+\item
+  \textbf{output}: probabilitat de patir un atac de cor:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    0 = sense o poca probabilitat
+  \item
+    1 = major probabilitat
+  \end{itemize}
+\end{itemize}
+
+Per altra banda, hi ha disponible un segon fitxer,
+\emph{o2Saturation.csv}, que conté múltiples observacions relacionades
+amb el nivell de saturació d'oxigen (una única variable). El fitxer
+conté moltíssimes més observacions (3586 en total) sense cap tipus
+d'idenfificador que ens permeti poder realitzar una integració de les
+dades d'ambdós fitxers per tenir un conjunt més complet.
+
+\hypertarget{integraciuxf3-i-selecciuxf3-de-les-dades-dinteruxe8s-a-analitzar}{%
+\section{Integració i selecció de les dades d'interès a
+analitzar}\label{integraciuxf3-i-selecciuxf3-de-les-dades-dinteruxe8s-a-analitzar}}
+
+\hypertarget{cuxe0rrega-de-dades}{%
+\subsection{Càrrega de dades}\label{cuxe0rrega-de-dades}}
 
 Abans de començar, és necessari carregar el fitxer en un data frame que
-ens permeti treballar de forma còmode amb les dades:
+ens permeti treballar de forma còmoda amb les dades a través del codi en
+R:
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# El joc de dades està conformat per un fitxer CSV, amb separació per comes i amb una capçalera, pel que carreguem el fitxer utilitzant la següent funció:}
-\NormalTok{dfHeartAttack }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"..}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{dataset}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{heart.csv"}\NormalTok{, }\AttributeTok{header=}\ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{dfHeartAttack }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"../dataset/heart.csv"}\NormalTok{, }\AttributeTok{header=}\ConstantTok{TRUE}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{exercici-3-neteja-de-les-dades}{%
-\subsection{Exercici 3: Neteja de les
-dades}\label{exercici-3-neteja-de-les-dades}}
+Una vegada carregades totes les dades, procedim a un primer anàlisi
+ràpid a partir del resum estadístic del data frame:
 
-\hypertarget{exercici-4-anuxe0lisi-de-les-dades}{%
-\subsection{Exercici 4: Anàlisi de les
-dades}\label{exercici-4-anuxe0lisi-de-les-dades}}
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Mostrem la informació bàsica del data frame per fer una comprovació a simple vista:}
+\FunctionTok{str}\NormalTok{(dfHeartAttack)}
+\end{Highlighting}
+\end{Shaded}
 
-\hypertarget{exercici-5-representaciuxf3-dels-resultats-a-partir-de-taules-i-gruxe0fiques}{%
-\subsection{Exercici 5: Representació dels resultats a partir de taules
-i
-gràfiques}\label{exercici-5-representaciuxf3-dels-resultats-a-partir-de-taules-i-gruxe0fiques}}
+\begin{verbatim}
+## 'data.frame':    303 obs. of  14 variables:
+##  $ age     : int  63 37 41 56 57 57 56 44 52 57 ...
+##  $ sex     : int  1 1 0 1 0 1 0 1 1 1 ...
+##  $ cp      : int  3 2 1 1 0 0 1 1 2 2 ...
+##  $ trtbps  : int  145 130 130 120 120 140 140 120 172 150 ...
+##  $ chol    : int  233 250 204 236 354 192 294 263 199 168 ...
+##  $ fbs     : int  1 0 0 0 0 0 0 0 1 0 ...
+##  $ restecg : int  0 1 0 1 1 1 0 1 1 1 ...
+##  $ thalachh: int  150 187 172 178 163 148 153 173 162 174 ...
+##  $ exng    : int  0 0 0 0 1 0 0 0 0 0 ...
+##  $ oldpeak : num  2.3 3.5 1.4 0.8 0.6 0.4 1.3 0 0.5 1.6 ...
+##  $ slp     : int  0 0 2 2 2 1 1 2 2 2 ...
+##  $ caa     : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ thall   : int  1 2 2 2 2 1 2 3 3 2 ...
+##  $ output  : int  1 1 1 1 1 1 1 1 1 1 ...
+\end{verbatim}
 
-\hypertarget{exercici-6-resoluciuxf3-del-problema}{%
-\subsection{Exercici 6: Resolució del
-problema}\label{exercici-6-resoluciuxf3-del-problema}}
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Mostrem també un resum estadístic de les variables del joc de dades:}
+\FunctionTok{skim}\NormalTok{(dfHeartAttack)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}ll@{}}
+\caption{Data summary}\tabularnewline
+\toprule\noalign{}
+\endfirsthead
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Name & dfHeartAttack \\
+Number of rows & 303 \\
+Number of columns & 14 \\
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ & \\
+Column type frequency: & \\
+numeric & 14 \\
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ & \\
+Group variables & None \\
+\end{longtable}
+
+\textbf{Variable type: numeric}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.1647}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.1176}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.1647}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.0824}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.0706}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.0471}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.0706}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.0706}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.0706}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.0706}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.0706}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+skim\_variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+n\_missing
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+complete\_rate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+mean
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+sd
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p0
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p25
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p50
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p75
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p100
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+hist
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+age & 0 & 1 & 54.37 & 9.08 & 29 & 47.5 & 55.0 & 61.0 & 77.0 & ▁▆▇▇▁ \\
+sex & 0 & 1 & 0.68 & 0.47 & 0 & 0.0 & 1.0 & 1.0 & 1.0 & ▃▁▁▁▇ \\
+cp & 0 & 1 & 0.97 & 1.03 & 0 & 0.0 & 1.0 & 2.0 & 3.0 & ▇▃▁▅▁ \\
+trtbps & 0 & 1 & 131.62 & 17.54 & 94 & 120.0 & 130.0 & 140.0 & 200.0 &
+▃▇▅▁▁ \\
+chol & 0 & 1 & 246.26 & 51.83 & 126 & 211.0 & 240.0 & 274.5 & 564.0 &
+▃▇▂▁▁ \\
+fbs & 0 & 1 & 0.15 & 0.36 & 0 & 0.0 & 0.0 & 0.0 & 1.0 & ▇▁▁▁▂ \\
+restecg & 0 & 1 & 0.53 & 0.53 & 0 & 0.0 & 1.0 & 1.0 & 2.0 & ▇▁▇▁▁ \\
+thalachh & 0 & 1 & 149.65 & 22.91 & 71 & 133.5 & 153.0 & 166.0 & 202.0 &
+▁▂▅▇▂ \\
+exng & 0 & 1 & 0.33 & 0.47 & 0 & 0.0 & 0.0 & 1.0 & 1.0 & ▇▁▁▁▃ \\
+oldpeak & 0 & 1 & 1.04 & 1.16 & 0 & 0.0 & 0.8 & 1.6 & 6.2 & ▇▂▁▁▁ \\
+slp & 0 & 1 & 1.40 & 0.62 & 0 & 1.0 & 1.0 & 2.0 & 2.0 & ▁▁▇▁▇ \\
+caa & 0 & 1 & 0.73 & 1.02 & 0 & 0.0 & 0.0 & 1.0 & 4.0 & ▇▃▂▁▁ \\
+thall & 0 & 1 & 2.31 & 0.61 & 0 & 2.0 & 2.0 & 3.0 & 3.0 & ▁▁▁▇▆ \\
+output & 0 & 1 & 0.54 & 0.50 & 0 & 0.0 & 1.0 & 1.0 & 1.0 & ▇▁▁▁▇ \\
+\end{longtable}
+
+Veiem que tenim un joc de dades compost per un total de 303 observacions
+i 14 variables.
+
+\hypertarget{anuxe0lisi-exploratori}{%
+\subsection{Anàlisi exploratori}\label{anuxe0lisi-exploratori}}
+
+Realitzem un primer anàlisi exploratori que ens permeti entendre millor
+el conjunt de dades:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Visualitzem la quantitat d\textquotesingle{}observacions que s\textquotesingle{}han identificat amb una probabilitat més alta i més baixa que es van identificar en  referència als atacs de cor:}
+\FunctionTok{ggplot}\NormalTok{(dfHeartAttack,}\FunctionTok{aes}\NormalTok{(}\FunctionTok{factor}\NormalTok{(output, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Baixa"}\NormalTok{, }\StringTok{"Alta"}\NormalTok{)), }\AttributeTok{fill=}\FunctionTok{factor}\NormalTok{(output, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Baixa"}\NormalTok{, }\StringTok{"Alta"}\NormalTok{)))) }\SpecialCharTok{+} 
+    \FunctionTok{geom\_bar}\NormalTok{() }\SpecialCharTok{+}\FunctionTok{labs}\NormalTok{(}\AttributeTok{x=}\StringTok{"Probabilitat"}\NormalTok{, }\AttributeTok{y=}\StringTok{"Pacients"}\NormalTok{) }\SpecialCharTok{+} 
+        \FunctionTok{guides}\NormalTok{(}\AttributeTok{fill=}\FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{title=}\StringTok{""}\NormalTok{)) }\SpecialCharTok{+} 
+        \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values=}\FunctionTok{c}\NormalTok{(}\StringTok{"\#008000"}\NormalTok{,}\StringTok{"\#800000"}\NormalTok{)) }\SpecialCharTok{+} 
+        \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Probabilitat d\textquotesingle{}atac de cor"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prac2_files/figure-latex/1_3_grafic_distribucio_probabilitat_atac_cor_joc_dades-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Calculem la proporció per poder tenir una idea de com es reparteixen les observacions:}
+\FunctionTok{table}\NormalTok{(dfHeartAttack}\SpecialCharTok{$}\NormalTok{output)}\SpecialCharTok{/}\FunctionTok{length}\NormalTok{(dfHeartAttack}\SpecialCharTok{$}\NormalTok{output)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##         0         1 
+## 0.4554455 0.5445545
+\end{verbatim}
+
+Veiem que les dades estan molt repartides entre els pacients que tenen
+una probabilitat major i menor de patir un atac de cor segons els
+factors registrats.
+
+Vegem la probabilitat de patir un atac de cor en base a les diferents
+variables:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{plotbyAge }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(dfHeartAttack,}\FunctionTok{aes}\NormalTok{(age, }\AttributeTok{fill=}\FunctionTok{factor}\NormalTok{(output, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Baixa"}\NormalTok{, }\StringTok{"Alta"}\NormalTok{)))) }\SpecialCharTok{+} 
+                    \FunctionTok{geom\_bar}\NormalTok{() }\SpecialCharTok{+}\FunctionTok{labs}\NormalTok{(}\AttributeTok{x=}\StringTok{"Edat"}\NormalTok{, }\AttributeTok{y=}\StringTok{"Pacients"}\NormalTok{) }\SpecialCharTok{+} 
+                    \FunctionTok{guides}\NormalTok{(}\AttributeTok{fill=}\FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{title=}\StringTok{""}\NormalTok{)) }\SpecialCharTok{+}
+                  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values=}\FunctionTok{c}\NormalTok{(}\StringTok{"\#008000"}\NormalTok{,}\StringTok{"\#800000"}\NormalTok{)) }\SpecialCharTok{+} 
+                    \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Probabilitat per edat"}\NormalTok{) }\SpecialCharTok{+}
+          \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{45}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+
+\NormalTok{plotbySex }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(dfHeartAttack,}\FunctionTok{aes}\NormalTok{(}\FunctionTok{factor}\NormalTok{(sex, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Femení"}\NormalTok{, }\StringTok{"Masculí"}\NormalTok{)), }\AttributeTok{fill=}\FunctionTok{factor}\NormalTok{(output, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Baixa"}\NormalTok{, }\StringTok{"Alta"}\NormalTok{)))) }\SpecialCharTok{+} 
+                    \FunctionTok{geom\_bar}\NormalTok{() }\SpecialCharTok{+}\FunctionTok{labs}\NormalTok{(}\AttributeTok{x=}\StringTok{"Gènere"}\NormalTok{, }\AttributeTok{y=}\StringTok{"Pacients"}\NormalTok{) }\SpecialCharTok{+} 
+                    \FunctionTok{guides}\NormalTok{(}\AttributeTok{fill=}\FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{title=}\StringTok{""}\NormalTok{)) }\SpecialCharTok{+} 
+                  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values=}\FunctionTok{c}\NormalTok{(}\StringTok{"\#008000"}\NormalTok{,}\StringTok{"\#800000"}\NormalTok{)) }\SpecialCharTok{+} 
+                    \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Probabilitat per gènere"}\NormalTok{) }\SpecialCharTok{+}
+          \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{45}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+
+\NormalTok{plotbyCP }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(dfHeartAttack,}\FunctionTok{aes}\NormalTok{(}\FunctionTok{factor}\NormalTok{(cp, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Angina típica"}\NormalTok{, }\StringTok{"Angina atípica"}\NormalTok{, }\StringTok{"No angina"}\NormalTok{, }\StringTok{"Assimptomàtic"}\NormalTok{)), }\AttributeTok{fill=}\FunctionTok{factor}\NormalTok{(output, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Baixa"}\NormalTok{, }\StringTok{"Alta"}\NormalTok{)))) }\SpecialCharTok{+} 
+                    \FunctionTok{geom\_bar}\NormalTok{() }\SpecialCharTok{+}\FunctionTok{labs}\NormalTok{(}\AttributeTok{x=}\StringTok{"Tipus de dolor"}\NormalTok{, }\AttributeTok{y=}\StringTok{"Pacients"}\NormalTok{) }\SpecialCharTok{+} 
+                    \FunctionTok{guides}\NormalTok{(}\AttributeTok{fill=}\FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{title=}\StringTok{""}\NormalTok{)) }\SpecialCharTok{+} 
+                  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values=}\FunctionTok{c}\NormalTok{(}\StringTok{"\#008000"}\NormalTok{,}\StringTok{"\#800000"}\NormalTok{)) }\SpecialCharTok{+} 
+                    \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Probabilitat per dolor toràcic"}\NormalTok{) }\SpecialCharTok{+}
+          \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{45}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+
+\NormalTok{plotbyExng }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(dfHeartAttack,}\FunctionTok{aes}\NormalTok{(}\FunctionTok{factor}\NormalTok{(exng, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"No"}\NormalTok{, }\StringTok{"Sí"}\NormalTok{)), }\AttributeTok{fill=}\FunctionTok{factor}\NormalTok{(output, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Baixa"}\NormalTok{, }\StringTok{"Alta"}\NormalTok{)))) }\SpecialCharTok{+} 
+                    \FunctionTok{geom\_bar}\NormalTok{() }\SpecialCharTok{+}\FunctionTok{labs}\NormalTok{(}\AttributeTok{x=}\StringTok{"Angina provocada per exercici"}\NormalTok{, }\AttributeTok{y=}\StringTok{"Pacients"}\NormalTok{) }\SpecialCharTok{+} 
+                    \FunctionTok{guides}\NormalTok{(}\AttributeTok{fill=}\FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{title=}\StringTok{""}\NormalTok{)) }\SpecialCharTok{+} 
+                  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values=}\FunctionTok{c}\NormalTok{(}\StringTok{"\#008000"}\NormalTok{,}\StringTok{"\#800000"}\NormalTok{)) }\SpecialCharTok{+} 
+                    \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Probabilitat per angina provocada per exercici"}\NormalTok{) }\SpecialCharTok{+}
+          \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{45}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+
+\NormalTok{plotbyFBS }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(dfHeartAttack,}\FunctionTok{aes}\NormalTok{(}\FunctionTok{factor}\NormalTok{(fbs, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Normal"}\NormalTok{, }\StringTok{"Alt"}\NormalTok{)), }\AttributeTok{fill=}\FunctionTok{factor}\NormalTok{(output, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Baixa"}\NormalTok{, }\StringTok{"Alta"}\NormalTok{)))) }\SpecialCharTok{+} 
+                    \FunctionTok{geom\_bar}\NormalTok{() }\SpecialCharTok{+}\FunctionTok{labs}\NormalTok{(}\AttributeTok{x=}\StringTok{"Nivell de sucre"}\NormalTok{, }\AttributeTok{y=}\StringTok{"Pacients"}\NormalTok{) }\SpecialCharTok{+} 
+                    \FunctionTok{guides}\NormalTok{(}\AttributeTok{fill=}\FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{title=}\StringTok{""}\NormalTok{)) }\SpecialCharTok{+} 
+                  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values=}\FunctionTok{c}\NormalTok{(}\StringTok{"\#008000"}\NormalTok{,}\StringTok{"\#800000"}\NormalTok{)) }\SpecialCharTok{+} 
+                    \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Probabilitat per nivell de sucre"}\NormalTok{) }\SpecialCharTok{+}
+          \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{45}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+
+\NormalTok{plotbyTRTBPS }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(dfHeartAttack,}\FunctionTok{aes}\NormalTok{(trtbps, }\AttributeTok{fill=}\FunctionTok{factor}\NormalTok{(output, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Baixa"}\NormalTok{, }\StringTok{"Alta"}\NormalTok{)))) }\SpecialCharTok{+} 
+                    \FunctionTok{geom\_bar}\NormalTok{() }\SpecialCharTok{+}\FunctionTok{labs}\NormalTok{(}\AttributeTok{x=}\StringTok{"Pressió arterial"}\NormalTok{, }\AttributeTok{y=}\StringTok{"Pacients"}\NormalTok{) }\SpecialCharTok{+} 
+                    \FunctionTok{guides}\NormalTok{(}\AttributeTok{fill=}\FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{title=}\StringTok{""}\NormalTok{)) }\SpecialCharTok{+} 
+                  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values=}\FunctionTok{c}\NormalTok{(}\StringTok{"\#008000"}\NormalTok{,}\StringTok{"\#800000"}\NormalTok{)) }\SpecialCharTok{+} 
+                    \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Probabilitat per pressió arterial en repòs"}\NormalTok{) }\SpecialCharTok{+}
+          \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{45}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+
+\NormalTok{plotbyChol }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(dfHeartAttack,}\FunctionTok{aes}\NormalTok{(chol, }\AttributeTok{fill=}\FunctionTok{factor}\NormalTok{(output, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Baixa"}\NormalTok{, }\StringTok{"Alta"}\NormalTok{)))) }\SpecialCharTok{+} 
+                    \FunctionTok{geom\_bar}\NormalTok{() }\SpecialCharTok{+}\FunctionTok{labs}\NormalTok{(}\AttributeTok{x=}\StringTok{"Colesterol"}\NormalTok{, }\AttributeTok{y=}\StringTok{"Pacients"}\NormalTok{) }\SpecialCharTok{+} 
+                    \FunctionTok{guides}\NormalTok{(}\AttributeTok{fill=}\FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{title=}\StringTok{""}\NormalTok{)) }\SpecialCharTok{+} 
+                  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values=}\FunctionTok{c}\NormalTok{(}\StringTok{"\#008000"}\NormalTok{,}\StringTok{"\#800000"}\NormalTok{)) }\SpecialCharTok{+} 
+                    \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Probabilitat per colesterol"}\NormalTok{) }\SpecialCharTok{+}
+          \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{45}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+
+\NormalTok{plotbyRestecg }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(dfHeartAttack,}\FunctionTok{aes}\NormalTok{(}\FunctionTok{factor}\NormalTok{(restecg, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Normal"}\NormalTok{, }\StringTok{"Anomalies"}\NormalTok{, }\StringTok{"Hipertròfia"}\NormalTok{)), }\AttributeTok{fill=}\FunctionTok{factor}\NormalTok{(output, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Baixa"}\NormalTok{, }\StringTok{"Alta"}\NormalTok{)))) }\SpecialCharTok{+} 
+                    \FunctionTok{geom\_bar}\NormalTok{() }\SpecialCharTok{+}\FunctionTok{labs}\NormalTok{(}\AttributeTok{x=}\StringTok{"Electrocardiograma"}\NormalTok{, }\AttributeTok{y=}\StringTok{"Pacients"}\NormalTok{) }\SpecialCharTok{+} 
+                    \FunctionTok{guides}\NormalTok{(}\AttributeTok{fill=}\FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{title=}\StringTok{""}\NormalTok{)) }\SpecialCharTok{+} 
+                  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values=}\FunctionTok{c}\NormalTok{(}\StringTok{"\#008000"}\NormalTok{,}\StringTok{"\#800000"}\NormalTok{)) }\SpecialCharTok{+} 
+                    \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Probabilitat per resultat de l\textquotesingle{}electrocardiograma"}\NormalTok{) }\SpecialCharTok{+}
+          \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{45}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+
+\NormalTok{plotbyOldpeak }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(dfHeartAttack,}\FunctionTok{aes}\NormalTok{(oldpeak, }\AttributeTok{fill=}\FunctionTok{factor}\NormalTok{(output, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Baixa"}\NormalTok{, }\StringTok{"Alta"}\NormalTok{)))) }\SpecialCharTok{+} 
+                    \FunctionTok{geom\_bar}\NormalTok{() }\SpecialCharTok{+}\FunctionTok{labs}\NormalTok{(}\AttributeTok{x=}\StringTok{"Canvis electrocardiograma"}\NormalTok{, }\AttributeTok{y=}\StringTok{"Pacients"}\NormalTok{) }\SpecialCharTok{+} 
+                    \FunctionTok{guides}\NormalTok{(}\AttributeTok{fill=}\FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{title=}\StringTok{""}\NormalTok{)) }\SpecialCharTok{+} 
+                  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values=}\FunctionTok{c}\NormalTok{(}\StringTok{"\#008000"}\NormalTok{,}\StringTok{"\#800000"}\NormalTok{)) }\SpecialCharTok{+} 
+                    \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Probabilitat per canvis en l\textquotesingle{}electrocardiograma"}\NormalTok{) }\SpecialCharTok{+}
+          \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{45}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+
+\NormalTok{plotbySLP }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(dfHeartAttack,}\FunctionTok{aes}\NormalTok{(}\FunctionTok{factor}\NormalTok{(slp, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Plana"}\NormalTok{, }\StringTok{"Ascendent"}\NormalTok{, }\StringTok{"Descendent"}\NormalTok{)), }\AttributeTok{fill=}\FunctionTok{factor}\NormalTok{(output, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Baixa"}\NormalTok{, }\StringTok{"Alta"}\NormalTok{)))) }\SpecialCharTok{+} 
+                    \FunctionTok{geom\_bar}\NormalTok{() }\SpecialCharTok{+}\FunctionTok{labs}\NormalTok{(}\AttributeTok{x=}\StringTok{"Pendent"}\NormalTok{, }\AttributeTok{y=}\StringTok{"Pacients"}\NormalTok{) }\SpecialCharTok{+} 
+                    \FunctionTok{guides}\NormalTok{(}\AttributeTok{fill=}\FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{title=}\StringTok{""}\NormalTok{)) }\SpecialCharTok{+} 
+                  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values=}\FunctionTok{c}\NormalTok{(}\StringTok{"\#008000"}\NormalTok{,}\StringTok{"\#800000"}\NormalTok{)) }\SpecialCharTok{+} 
+                    \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Probabilitat per patró de canvi"}\NormalTok{) }\SpecialCharTok{+}
+          \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{45}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+
+\NormalTok{plotbyThalachh }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(dfHeartAttack,}\FunctionTok{aes}\NormalTok{(thalachh, }\AttributeTok{fill=}\FunctionTok{factor}\NormalTok{(output, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Baixa"}\NormalTok{, }\StringTok{"Alta"}\NormalTok{)))) }\SpecialCharTok{+} 
+                    \FunctionTok{geom\_bar}\NormalTok{() }\SpecialCharTok{+}\FunctionTok{labs}\NormalTok{(}\AttributeTok{x=}\StringTok{"Freqüència"}\NormalTok{, }\AttributeTok{y=}\StringTok{"Pacients"}\NormalTok{) }\SpecialCharTok{+} 
+                    \FunctionTok{guides}\NormalTok{(}\AttributeTok{fill=}\FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{title=}\StringTok{""}\NormalTok{)) }\SpecialCharTok{+} 
+                  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values=}\FunctionTok{c}\NormalTok{(}\StringTok{"\#008000"}\NormalTok{,}\StringTok{"\#800000"}\NormalTok{)) }\SpecialCharTok{+} 
+                    \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Probabilitat per freqüència màxima registrada"}\NormalTok{) }\SpecialCharTok{+}
+          \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{45}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+
+\NormalTok{plotbyCAA }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(dfHeartAttack,}\FunctionTok{aes}\NormalTok{(caa, }\AttributeTok{fill=}\FunctionTok{factor}\NormalTok{(output, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Baixa"}\NormalTok{, }\StringTok{"Alta"}\NormalTok{)))) }\SpecialCharTok{+} 
+                    \FunctionTok{geom\_bar}\NormalTok{() }\SpecialCharTok{+}\FunctionTok{labs}\NormalTok{(}\AttributeTok{x=}\StringTok{"Vasos"}\NormalTok{, }\AttributeTok{y=}\StringTok{"Pacients"}\NormalTok{) }\SpecialCharTok{+} 
+                    \FunctionTok{guides}\NormalTok{(}\AttributeTok{fill=}\FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{title=}\StringTok{""}\NormalTok{)) }\SpecialCharTok{+} 
+                  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values=}\FunctionTok{c}\NormalTok{(}\StringTok{"\#008000"}\NormalTok{,}\StringTok{"\#800000"}\NormalTok{)) }\SpecialCharTok{+} 
+                    \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Probabilitat per vasos sanguinis obstruïts"}\NormalTok{) }\SpecialCharTok{+}
+          \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{45}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+
+\NormalTok{plotbyThall }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(dfHeartAttack,}\FunctionTok{aes}\NormalTok{(}\FunctionTok{factor}\NormalTok{(thall, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Unknown"}\NormalTok{, }\StringTok{"Sense"}\NormalTok{, }\StringTok{"Defecte fix"}\NormalTok{, }\StringTok{"Defecte reversible"}\NormalTok{)), }\AttributeTok{fill=}\FunctionTok{factor}\NormalTok{(output, }\AttributeTok{levels =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Baixa"}\NormalTok{, }\StringTok{"Alta"}\NormalTok{)))) }\SpecialCharTok{+} 
+                    \FunctionTok{geom\_bar}\NormalTok{() }\SpecialCharTok{+}\FunctionTok{labs}\NormalTok{(}\AttributeTok{x=}\StringTok{"Indicis"}\NormalTok{, }\AttributeTok{y=}\StringTok{"Pacients"}\NormalTok{) }\SpecialCharTok{+} 
+                    \FunctionTok{guides}\NormalTok{(}\AttributeTok{fill=}\FunctionTok{guide\_legend}\NormalTok{(}\AttributeTok{title=}\StringTok{""}\NormalTok{)) }\SpecialCharTok{+} 
+                  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values=}\FunctionTok{c}\NormalTok{(}\StringTok{"\#008000"}\NormalTok{,}\StringTok{"\#800000"}\NormalTok{)) }\SpecialCharTok{+} 
+                    \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Probabilitat per talassèmia"}\NormalTok{) }\SpecialCharTok{+}
+          \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{45}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{))}
+
+\FunctionTok{grid.newpage}\NormalTok{()}
+\FunctionTok{grid.arrange}\NormalTok{(plotbyAge, plotbySex, plotbyCP, plotbyExng, plotbyFBS, plotbyTRTBPS, plotbyChol, plotbyRestecg, plotbyOldpeak, plotbySLP, plotbyThalachh, plotbyCAA, plotbyThall, }\AttributeTok{ncol=}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prac2_files/figure-latex/1_4_grafics_distribuciovariables_joc_dades-1.pdf}
+
+Finalment, creem un gràfic on es mostrin les possibles relacions
+existentes entre les variables per veure, de forma ràpida, si podem
+veure algunes correlacions de forma directa:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Generem un gràfic que compara parells de variables entre elles, el que ens permet}
+\FunctionTok{ggpairs}\NormalTok{(}\AttributeTok{data =}\NormalTok{ dfHeartAttack, }\AttributeTok{columns =} \DecValTok{1}\SpecialCharTok{:}\DecValTok{13}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prac2_files/figure-latex/1_5_grafic_dispersio_variables_joc_dades-1.pdf}
+
+Observant els diversos factors que es troben dins el conjunt de dades i
+tots els gràfics creats, sembla que la variància entre els diferents
+valors, així com la, a priori, poca correlació entre les variables i la
+seva relació amb la probabilitat de patir un atac de cor podria ser
+interessant mantenir tots els atributs que tenim per poder utilitzar-los
+durant la resta de l'anàlisi.
+
+\hypertarget{integraciuxf3-selecciuxf3-i-reducciuxf3-de-dades}{%
+\subsection{Integració, selecció i reducció de
+dades}\label{integraciuxf3-selecciuxf3-i-reducciuxf3-de-dades}}
+
+La \textbf{integració} consisteix en la combinació de dades de diferents
+fonts, per tal de crear una estructura de dades coherent. En el cas
+d'estudi, aquesta integració ja està realitzada i tenim, de cada
+observació, totes les variables en columnes.
+
+La \textbf{selecció} consisteix en filtrar o seleccionar les dades
+d'interès. A partir de l'anàlisi exploratori que hem realitzat
+consideram vàlides totes les dades i no cal filtrar ni reduir la
+dimensionalitat del dataset.
+
+\hypertarget{neteja-de-les-dades}{%
+\section{Neteja de les dades}\label{neteja-de-les-dades}}
+
+\hypertarget{valors-nulls}{%
+\subsection{Valors nul·ls}\label{valors-nulls}}
+
+Comprobem si existeixen valors nul·ls en les dades, tot i que,
+aparentment, al revisar els resultats del resum estadístic anterior
+sembla que no existeixi cap valor d'aquest tipus:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Revisem el total de valors NA i blancs que hi ha a cada variable:}
+\FunctionTok{colSums}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(dfHeartAttack))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      age      sex       cp   trtbps     chol      fbs  restecg thalachh 
+##        0        0        0        0        0        0        0        0 
+##     exng  oldpeak      slp      caa    thall   output 
+##        0        0        0        0        0        0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{colSums}\NormalTok{(dfHeartAttack }\SpecialCharTok{==} \StringTok{""}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      age      sex       cp   trtbps     chol      fbs  restecg thalachh 
+##        0        0        0        0        0        0        0        0 
+##     exng  oldpeak      slp      caa    thall   output 
+##        0        0        0        0        0        0
+\end{verbatim}
+
+Es confirma que no existeixen valors d'aquest tipus en el conjunt de
+dades, pel que no serà necessari realitzar cap acció al respecte. En cas
+de tenir valors d'aquest tipus hauriem de pensar si treure'ls o bé
+realitzar una aproximació del possible valor a partir de la resta de
+valors de la variable en qüestió.
+
+\hypertarget{valors-atuxedpics}{%
+\subsection{Valors atípics}\label{valors-atuxedpics}}
+
+Respecte a les variables categòriques, podem comprovar en el resum
+estadístic que no hi ha cap valor fora del rang vàlid; per tant no tenen
+valors atípics.
+
+Respecte a les variables numèriques, utilitzarem els diagrames de caixa
+per poder veure ràpidament si existeix algun valor atípic o
+\emph{outlier} en el joc de dades:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Calculem els diferents gràfics de caixa:}
+\NormalTok{bpAge }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ dfHeartAttack) }\SpecialCharTok{+}
+  \FunctionTok{geom\_boxplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ age, }\AttributeTok{fill =} \StringTok{"Edat"}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values =} \StringTok{"\#008080"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Boxplot per edat"}\NormalTok{)}
+
+\NormalTok{bpTRTBPS }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ dfHeartAttack) }\SpecialCharTok{+}
+  \FunctionTok{geom\_boxplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ trtbps, }\AttributeTok{fill =} \StringTok{"Pres."}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values =} \StringTok{"\#00A595"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Boxplot per pressió arterial en repòs"}\NormalTok{)}
+
+\NormalTok{bpChol }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ dfHeartAttack) }\SpecialCharTok{+}
+  \FunctionTok{geom\_boxplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ chol, }\AttributeTok{fill =} \StringTok{"Col."}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values =} \StringTok{"\#00B080"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Boxplot per nivell de colesterol"}\NormalTok{)}
+
+\NormalTok{bpOldpeak }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ dfHeartAttack) }\SpecialCharTok{+}
+  \FunctionTok{geom\_boxplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ oldpeak, }\AttributeTok{fill =} \StringTok{"Canv."}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values =} \StringTok{"\#00C0B0"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Boxplot per canvis en l\textquotesingle{}electrocardiograma"}\NormalTok{)}
+
+\NormalTok{bpThalachh }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ dfHeartAttack) }\SpecialCharTok{+}
+  \FunctionTok{geom\_boxplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ thalachh, }\AttributeTok{fill =} \StringTok{"Freq."}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values =} \StringTok{"\#00D0A0"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Boxplot per freqüència màxima registrada"}\NormalTok{)}
+
+\CommentTok{\# Mostrem els diferents gràfics de forma agrupada:}
+\FunctionTok{grid.newpage}\NormalTok{()}
+\FunctionTok{grid.arrange}\NormalTok{(bpAge, bpTRTBPS, bpChol, bpOldpeak, bpThalachh, }\AttributeTok{ncol=}\DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prac2_files/figure-latex/2_2_valors_atipics_joc_dades-1.pdf}
+
+S'observen valors extrems a partir dels gràfics per algunes de les
+variables. No obstant, veiem que són valors que estan dintre dels
+paràmetres que es poden considerar com a vàlids:
+
+\begin{itemize}
+\tightlist
+\item
+  Pressió arterial per sobre de 170: tot i que estigui per sobre del
+  normal, és un valor possible i, per tant, els mantindrem dintre del
+  joc de dades.
+\item
+  Colesterol per sobre de 400: novament ens trobem davant de valors
+  extrems, però que es troben dins d'un rang possible, pel que
+  mantindrem aquestes observacions dins el joc de dades a analitzar.
+\item
+  Canvis en l'electrocardiograma per sobre de 4: tot i que està fora
+  dels valors més comuns, no està tant distanciat com per considerar
+  treure'ls de l'anàlisi.
+\item
+  Freqüència màxima registrada per sota de 100: tot i que existeixi un
+  valor més baix, aquest és un valor possible i, per tant, el mantindrem
+  dins el joc de dades.
+\end{itemize}
+
+En resum, no s'han trobat valors anòmals que puguin considerar-se fora
+dels valors possibles, tot i que sí hi ha alguns valors extrems degut a
+les condicions físiques i/o de salut dels diferents pacients.
+Possiblement aquests valors poden ser importants a l'hora de fer
+estimacions. No procedeix eliminar cap valor atípic.
+
+\hypertarget{normalitzaciuxf3-i-discretitzaciuxf3}{%
+\subsection{Normalització i
+discretització}\label{normalitzaciuxf3-i-discretitzaciuxf3}}
+
+La normalització de les dades ens permet obtenir valors en escales que
+permetin comparar la magnitud de forma similar entre els diferents rangs
+de valors que tenen les variables.
+
+Per altra banda, la discretització ens permet agrupar observacions
+numèriques per tenir noves categories que puguin resultar útils durant
+l'anàlisi (per exemple en algorismes de classificació d'arbre):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Seleccionem la llavor per l\textquotesingle{}algoritme randomitzador:}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{1234}\NormalTok{)}
+
+\CommentTok{\# data frame Heart Attack Normalitzat (dfHAN)}
+\NormalTok{dfHAN }\OtherTok{\textless{}{-}}\NormalTok{ dfHeartAttack }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{mutate}\NormalTok{( }\CommentTok{\# Discretització}
+          \AttributeTok{age.d =} \FunctionTok{discretize}\NormalTok{(age, }\StringTok{"cluster"}\NormalTok{, }\AttributeTok{breaks =} \DecValTok{5}\NormalTok{),}
+          \AttributeTok{trtbps.d =} \FunctionTok{discretize}\NormalTok{(trtbps, }\StringTok{"cluster"}\NormalTok{, }\AttributeTok{breaks =} \DecValTok{3}\NormalTok{),}
+          \AttributeTok{chol.d =} \FunctionTok{discretize}\NormalTok{(chol, }\StringTok{"cluster"}\NormalTok{, }\AttributeTok{breaks =} \DecValTok{5}\NormalTok{),}
+          \AttributeTok{thalachh.d =} \FunctionTok{discretize}\NormalTok{(thalachh, }\StringTok{"cluster"}\NormalTok{, }\AttributeTok{breaks =} \DecValTok{3}\NormalTok{),}
+          \CommentTok{\#  Normalització}
+          \AttributeTok{age =} \FunctionTok{scale}\NormalTok{( age, }\AttributeTok{center=}\ConstantTok{TRUE}\NormalTok{, }\AttributeTok{scale=}\ConstantTok{TRUE}\NormalTok{ )[,}\DecValTok{1}\NormalTok{],}
+          \AttributeTok{sex =} \FunctionTok{factor}\NormalTok{( }\FunctionTok{ifelse}\NormalTok{( sex}\SpecialCharTok{==}\DecValTok{1}\NormalTok{, }\StringTok{"Masculí"}\NormalTok{, }
+                          \FunctionTok{ifelse}\NormalTok{( sex}\SpecialCharTok{==}\DecValTok{0}\NormalTok{, }\StringTok{"Femení"}\NormalTok{, }\StringTok{"?"}\NormalTok{))),}
+          \AttributeTok{cp =} \FunctionTok{factor}\NormalTok{( }\FunctionTok{ifelse}\NormalTok{( cp}\SpecialCharTok{==}\DecValTok{0}\NormalTok{, }\StringTok{"Angina típica"}\NormalTok{,}
+                         \FunctionTok{ifelse}\NormalTok{( cp}\SpecialCharTok{==}\DecValTok{1}\NormalTok{, }\StringTok{"Angina atípica"}\NormalTok{,}
+                         \FunctionTok{ifelse}\NormalTok{( cp}\SpecialCharTok{==}\DecValTok{2}\NormalTok{, }\StringTok{"Dolor no relacionat amb angina"}\NormalTok{,}
+                         \FunctionTok{ifelse}\NormalTok{( cp}\SpecialCharTok{==}\DecValTok{3}\NormalTok{, }\StringTok{"Sense dolor toràcic"}\NormalTok{, }\StringTok{"?"}\NormalTok{))))),}
+          \AttributeTok{trtbps =} \FunctionTok{scale}\NormalTok{( trtbps, }\AttributeTok{center=}\ConstantTok{TRUE}\NormalTok{, }\AttributeTok{scale=}\ConstantTok{TRUE}\NormalTok{ )[,}\DecValTok{1}\NormalTok{],}
+          \AttributeTok{chol =} \FunctionTok{scale}\NormalTok{( chol, }\AttributeTok{center=}\ConstantTok{TRUE}\NormalTok{, }\AttributeTok{scale=}\ConstantTok{TRUE}\NormalTok{ )[,}\DecValTok{1}\NormalTok{],}
+          \AttributeTok{fbs =} \FunctionTok{factor}\NormalTok{( }\FunctionTok{ifelse}\NormalTok{( fbs}\SpecialCharTok{==}\DecValTok{0}\NormalTok{, }\StringTok{"Normal"}\NormalTok{,}
+                          \FunctionTok{ifelse}\NormalTok{( fbs}\SpecialCharTok{==}\DecValTok{1}\NormalTok{, }\StringTok{"Alt"}\NormalTok{, }\StringTok{"?"}\NormalTok{))),}
+          \AttributeTok{restecg =} \FunctionTok{factor}\NormalTok{( }\FunctionTok{ifelse}\NormalTok{( restecg}\SpecialCharTok{==}\DecValTok{0}\NormalTok{, }\StringTok{"Normal"}\NormalTok{,}
+                            \FunctionTok{ifelse}\NormalTok{( restecg}\SpecialCharTok{==}\DecValTok{1}\NormalTok{, }\StringTok{"Anomalies ST{-}T"}\NormalTok{,}
+                            \FunctionTok{ifelse}\NormalTok{( restecg}\SpecialCharTok{==}\DecValTok{2}\NormalTok{, }\StringTok{"Hipertrofia ventricular"}\NormalTok{, }\StringTok{"?"}\NormalTok{)))),}
+          \AttributeTok{thalachh =} \FunctionTok{scale}\NormalTok{( thalachh, }\AttributeTok{center=}\ConstantTok{TRUE}\NormalTok{, }\AttributeTok{scale=}\ConstantTok{TRUE}\NormalTok{ )[,}\DecValTok{1}\NormalTok{],}
+          \AttributeTok{exng =} \FunctionTok{factor}\NormalTok{( }\FunctionTok{ifelse}\NormalTok{( exng}\SpecialCharTok{==}\DecValTok{0}\NormalTok{, }\StringTok{"No exercici"}\NormalTok{,}
+                         \FunctionTok{ifelse}\NormalTok{( exng}\SpecialCharTok{==}\DecValTok{1}\NormalTok{, }\StringTok{"Si exercici"}\NormalTok{, }\StringTok{"?"}\NormalTok{))),}
+          \AttributeTok{oldpeak =} \FunctionTok{scale}\NormalTok{( oldpeak, }\AttributeTok{center=}\ConstantTok{TRUE}\NormalTok{, }\AttributeTok{scale=}\ConstantTok{TRUE}\NormalTok{ )[,}\DecValTok{1}\NormalTok{],}
+          \AttributeTok{slp =} \FunctionTok{factor}\NormalTok{( }\FunctionTok{ifelse}\NormalTok{( slp}\SpecialCharTok{==}\DecValTok{0}\NormalTok{, }\StringTok{"Pendent plana"}\NormalTok{,}
+                        \FunctionTok{ifelse}\NormalTok{( slp}\SpecialCharTok{==}\DecValTok{1}\NormalTok{, }\StringTok{"Pendent ascendent"}\NormalTok{,}
+                        \FunctionTok{ifelse}\NormalTok{( slp}\SpecialCharTok{==}\DecValTok{2}\NormalTok{, }\StringTok{"Pendent descendent"}\NormalTok{, }\StringTok{"?"}\NormalTok{)))),}
+          \AttributeTok{caa =} \FunctionTok{factor}\NormalTok{( }\FunctionTok{ifelse}\NormalTok{( caa}\SpecialCharTok{==}\DecValTok{0}\NormalTok{, }\StringTok{"Sense obstrucció"}\NormalTok{,}
+                        \FunctionTok{ifelse}\NormalTok{( caa}\SpecialCharTok{==}\DecValTok{1}\NormalTok{, }\StringTok{"Obstrucció en un vas"}\NormalTok{,}
+                        \FunctionTok{ifelse}\NormalTok{( caa}\SpecialCharTok{==}\DecValTok{2}\NormalTok{, }\StringTok{"Obstrucció de dos vasos"}\NormalTok{,}
+                        \FunctionTok{ifelse}\NormalTok{( caa}\SpecialCharTok{==}\DecValTok{3}\NormalTok{, }\StringTok{"Obstrucció de tres vasos"}\NormalTok{,}
+                        \FunctionTok{ifelse}\NormalTok{( caa}\SpecialCharTok{==}\DecValTok{4}\NormalTok{, }\StringTok{"Obstrucció de quatre vasos"}\NormalTok{, }\StringTok{"?"}\NormalTok{)))))),}
+          \AttributeTok{thall =} \FunctionTok{factor}\NormalTok{( }\FunctionTok{ifelse}\NormalTok{( thall}\SpecialCharTok{==}\DecValTok{1}\NormalTok{, }\StringTok{"No hi ha antecedents"}\NormalTok{,}
+                          \FunctionTok{ifelse}\NormalTok{( thall}\SpecialCharTok{==}\DecValTok{2}\NormalTok{, }\StringTok{"Presència defecte fix"}\NormalTok{,}
+                          \FunctionTok{ifelse}\NormalTok{( thall}\SpecialCharTok{==}\DecValTok{3}\NormalTok{, }\StringTok{"Presència de defecte reversible"}\NormalTok{, }\StringTok{"?"}\NormalTok{)))),}
+          \AttributeTok{resultat =} \FunctionTok{factor}\NormalTok{( }\FunctionTok{ifelse}\NormalTok{( output}\SpecialCharTok{==}\DecValTok{0}\NormalTok{, }\StringTok{"Atac probable"}\NormalTok{,}
+                             \FunctionTok{ifelse}\NormalTok{( output}\SpecialCharTok{==}\DecValTok{1}\NormalTok{, }\StringTok{"Atac poc probable"}\NormalTok{, }\StringTok{"?"}\NormalTok{))))}
+
+\NormalTok{dfHANnum }\OtherTok{\textless{}{-}}\NormalTok{ dfHAN }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{select}\NormalTok{(age, trtbps, chol, thalachh, oldpeak )}
+
+\NormalTok{dfHANcat }\OtherTok{\textless{}{-}}\NormalTok{ dfHAN }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{select}\NormalTok{(age.d, trtbps.d, chol.d, thalachh.d, sex, cp, fbs, restecg, exng, slp, caa, thall, resultat)}
+
+\FunctionTok{skim}\NormalTok{(dfHAN)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}ll@{}}
+\caption{Data summary}\tabularnewline
+\toprule\noalign{}
+\endfirsthead
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Name & dfHAN \\
+Number of rows & 303 \\
+Number of columns & 19 \\
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ & \\
+Column type frequency: & \\
+factor & 13 \\
+numeric & 6 \\
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ & \\
+Group variables & None \\
+\end{longtable}
+
+\textbf{Variable type: factor}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1522}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1087}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1522}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.0870}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.0978}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.4022}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+skim\_variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+n\_missing
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+complete\_rate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+ordered
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+n\_unique
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+top\_counts
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+sex & 0 & 1 & FALSE & 2 & Mas: 207, Fem: 96 \\
+cp & 0 & 1 & FALSE & 4 & Ang: 143, Dol: 87, Ang: 50, Sen: 23 \\
+fbs & 0 & 1 & FALSE & 2 & Nor: 258, Alt: 45 \\
+restecg & 0 & 1 & FALSE & 3 & Ano: 152, Nor: 147, Hip: 4 \\
+exng & 0 & 1 & FALSE & 2 & No : 204, Si : 99 \\
+slp & 0 & 1 & FALSE & 3 & Pen: 142, Pen: 140, Pen: 21 \\
+caa & 0 & 1 & FALSE & 5 & Sen: 175, Obs: 65, Obs: 38, Obs: 20 \\
+thall & 0 & 1 & FALSE & 4 & Pre: 166, Pre: 117, No : 18, ?: 2 \\
+age.d & 0 & 1 & FALSE & 5 & {[}53: 104, {[}61: 71, {[}46: 57, {[}40:
+52 \\
+trtbps.d & 0 & 1 & FALSE & 3 & {[}11: 153, {[}13: 97, {[}94: 53 \\
+chol.d & 0 & 1 & FALSE & 5 & {[}23: 101, {[}19: 100, {[}28: 65, {[}12:
+32 \\
+thalachh.d & 0 & 1 & FALSE & 3 & {[}13: 141, {[}16: 85, {[}71: 77 \\
+resultat & 0 & 1 & FALSE & 2 & Ata: 165, Ata: 138 \\
+\end{longtable}
+
+\textbf{Variable type: numeric}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.1728}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.1235}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.1728}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.0617}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.0494}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.0741}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.0741}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.0741}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.0617}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.0617}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 20\tabcolsep) * \real{0.0741}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+skim\_variable
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+n\_missing
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+complete\_rate
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+mean
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+sd
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p0
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p25
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p50
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p75
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+p100
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+hist
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+age & 0 & 1 & 0.00 & 1.0 & -2.79 & -0.76 & 0.07 & 0.73 & 2.49 & ▁▆▇▇▁ \\
+trtbps & 0 & 1 & 0.00 & 1.0 & -2.15 & -0.66 & -0.09 & 0.48 & 3.90 &
+▃▇▅▁▁ \\
+chol & 0 & 1 & 0.00 & 1.0 & -2.32 & -0.68 & -0.12 & 0.54 & 6.13 &
+▃▇▂▁▁ \\
+thalachh & 0 & 1 & 0.00 & 1.0 & -3.43 & -0.70 & 0.15 & 0.71 & 2.29 &
+▁▂▅▇▂ \\
+oldpeak & 0 & 1 & 0.00 & 1.0 & -0.90 & -0.90 & -0.21 & 0.48 & 4.44 &
+▇▂▁▁▁ \\
+output & 0 & 1 & 0.54 & 0.5 & 0.00 & 0.00 & 1.00 & 1.00 & 1.00 &
+▇▁▁▁▇ \\
+\end{longtable}
+
+\hypertarget{anuxe0lisi-de-components-principals}{%
+\subsection{Anàlisi de components
+principals}\label{anuxe0lisi-de-components-principals}}
+
+Una possible forma de reduir-ne la dimensionalitat és considerar els
+components principals de les variables numériques:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pca.acc }\OtherTok{\textless{}{-}} \FunctionTok{prcomp}\NormalTok{(dfHANnum, }\AttributeTok{scale. =} \ConstantTok{TRUE}\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{( pca.acc )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Importance of components:
+##                           PC1    PC2    PC3    PC4     PC5
+## Standard deviation     1.3441 1.0380 0.9399 0.8713 0.68799
+## Proportion of Variance 0.3613 0.2155 0.1767 0.1518 0.09467
+## Cumulative Proportion  0.3613 0.5768 0.7535 0.9053 1.00000
+\end{verbatim}
+
+Podem veure que partim de cinc variables i necessitam quatre per arribar
+a descriure el 90\% de la variabilitat total, per la qual cosa no suposa
+una gran reducció de dimensionalitat.
+
+\hypertarget{anuxe0lisi-de-les-dades}{%
+\section{Anàlisi de les dades}\label{anuxe0lisi-de-les-dades}}
+
+\hypertarget{test-de-normalitat}{%
+\subsection{Test de normalitat}\label{test-de-normalitat}}
+
+Per facilitar els càlculs futurs, es procedirà a un anàlisi de la
+normalitat dels valors numèrics del conjunt de dades, el que ens
+permetrà saber si és possible aplicar certs tests més endavant.
+
+Comencem amb un test de Shapiro-Wilk de normalitat:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Realitzem el test de normalitat Shapiro{-}Wilk a les diferents variables numériques}
+
+\FunctionTok{apply}\NormalTok{( dfHANnum, }\DecValTok{2}\NormalTok{, shapiro.test )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## $age
+## 
+##  Shapiro-Wilk normality test
+## 
+## data:  newX[, i]
+## W = 0.98637, p-value = 0.005798
+## 
+## 
+## $trtbps
+## 
+##  Shapiro-Wilk normality test
+## 
+## data:  newX[, i]
+## W = 0.96592, p-value = 1.458e-06
+## 
+## 
+## $chol
+## 
+##  Shapiro-Wilk normality test
+## 
+## data:  newX[, i]
+## W = 0.94688, p-value = 5.365e-09
+## 
+## 
+## $thalachh
+## 
+##  Shapiro-Wilk normality test
+## 
+## data:  newX[, i]
+## W = 0.97632, p-value = 6.621e-05
+## 
+## 
+## $oldpeak
+## 
+##  Shapiro-Wilk normality test
+## 
+## data:  newX[, i]
+## W = 0.84418, p-value < 2.2e-16
+\end{verbatim}
+
+Tots els test mostren que les variables no segueixen una distribució
+totalment normal. No obstant, es compleixen els requisits per pode
+aplica el \emph{Teorema del Límit Central}. Mostram a continuació els
+gràfics QQ per mostrar gràficament la normalitat de les dades:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Creem els diferents gràfics QQ per comprovar si les dades de les variables segueixen o s\textquotesingle{}aproximen a una distribució normal:}
+\NormalTok{qqAge }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ dfHAN, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{sample =}\NormalTok{ age)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_qq}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{geom\_qq\_line}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"Valors teòrics"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Valors observats"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Gràfic QQnorm: \textquotesingle{}age\textquotesingle{}"}\NormalTok{)}
+
+\NormalTok{qqTRTBPS }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ dfHAN, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{sample =}\NormalTok{ trtbps)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_qq}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{geom\_qq\_line}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"Valors teòrics"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Valors observats"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Gràfic QQnorm: \textquotesingle{}trtbps\textquotesingle{}"}\NormalTok{)}
+
+\NormalTok{qqChol }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ dfHAN, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{sample =}\NormalTok{ chol)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_qq}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{geom\_qq\_line}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"Valors teòrics"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Valors observats"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Gràfic QQnorm: \textquotesingle{}chol\textquotesingle{}"}\NormalTok{)}
+
+\NormalTok{qqOldpeak }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ dfHAN, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{sample =}\NormalTok{ oldpeak)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_qq}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{geom\_qq\_line}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"Valors teòrics"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Valors observats"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Gràfic QQnorm: \textquotesingle{}oldpeak\textquotesingle{}"}\NormalTok{)}
+
+\NormalTok{qqThalachh }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ dfHAN, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{sample =}\NormalTok{ thalachh)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_qq}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{geom\_qq\_line}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"Valors teòrics"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Valors observats"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"Gràfic QQnorm: \textquotesingle{}thalachh\textquotesingle{}"}\NormalTok{)}
+
+\CommentTok{\# Mostrem els diferents gràfics de forma agrupada:}
+\FunctionTok{grid.newpage}\NormalTok{()}
+\FunctionTok{grid.arrange}\NormalTok{(qqAge, qqTRTBPS, qqChol, qqOldpeak, qqThalachh, }\AttributeTok{ncol=}\DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prac2_files/figure-latex/3_2_grafic_qq_variables_numeriques_joc_dades-1.pdf}
+
+Amb els resultats obtinguts, podem observar que les variables
+numèriques, tot i no tenir un a distribució normal, sí semblen tendir a
+aquesta. L'únic cas que podriem considerar que no és tant així seria per
+la variable \emph{oldpeak}, ja que és la única que no té una distribució
+tant propera a la línia que podriem considerar que defineix la
+normalitat.
+
+\hypertarget{correlaciuxf3-de-les-variables}{%
+\subsection{Correlació de les
+variables}\label{correlaciuxf3-de-les-variables}}
+
+Tot i que ja s'ha vist anteriorment que semblava que no hi havia
+correlacions molt fortes entre les diferents variables, procedim a
+analitzar-ho més a fons:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Generam un gràfic de correlació que ens permeti analitzar{-}ho fàcilment (només aquelles variables que no siguin factors):}
+\NormalTok{res}\OtherTok{\textless{}{-}}\FunctionTok{cor}\NormalTok{(dfHeartAttack[, }\DecValTok{1}\SpecialCharTok{:}\DecValTok{14}\NormalTok{])}
+\FunctionTok{corrplot}\NormalTok{(res, }\AttributeTok{method=}\StringTok{"color"}\NormalTok{, }\AttributeTok{tl.col=}\StringTok{"black"}\NormalTok{, }\AttributeTok{tl.srt=}\DecValTok{30}\NormalTok{, }\AttributeTok{order =} \StringTok{"AOE"}\NormalTok{, }\AttributeTok{number.cex=}\FloatTok{0.75}\NormalTok{, }\AttributeTok{sig.level =} \FloatTok{0.01}\NormalTok{, }\AttributeTok{addCoef.col =} \StringTok{"black"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prac2_files/figure-latex/3_3_correlacio_variables_numeriques_joc_dades-1.pdf}
+
+La més forta d'aquestes correspon amb una correlació negativa entre el
+patró de canvi de l'electrocardiograma en una situació d'estrés
+(variable \emph{slp}) i el canvi en el segment ST de
+l'electrocardiograma (variable \emph{oldpeak}). Mentre que la més forta
+amb valor positiu correspon a ula correlació entre el tipus de dolor
+toràcic (variable \emph{cp}) i la probabilitat d'un atac de cor
+(variable \emph{output}).
+
+Cal tenir en compte que aquestes correlacions no són molt fortes i el
+signe ens indica que quan una augmenta o disminueix, la variable
+correlacionada actúa de la mateixa manera en certa proporció segons la
+potència d'aquesta correlació.
+
+Podem fer la correlació únicament sobre les variables numériques:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Generam un gràfic de correlació que ens permeti analitzar{-}ho fàcilment (només aquelles variables que no siguin factors):}
+\NormalTok{res }\OtherTok{\textless{}{-}} \FunctionTok{cor}\NormalTok{( dfHANnum )}
+\FunctionTok{corrplot}\NormalTok{(res, }\AttributeTok{method=}\StringTok{"color"}\NormalTok{, }\AttributeTok{tl.col=}\StringTok{"black"}\NormalTok{, }\AttributeTok{tl.srt=}\DecValTok{30}\NormalTok{, }\AttributeTok{order =} \StringTok{"AOE"}\NormalTok{, }\AttributeTok{number.cex=}\FloatTok{0.75}\NormalTok{, }\AttributeTok{sig.level =} \FloatTok{0.01}\NormalTok{, }\AttributeTok{addCoef.col =} \StringTok{"black"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prac2_files/figure-latex/3_3_correlacio_variables_numeriques_joc_dades_2-1.pdf}
+
+Amb els resultats obtinguts, no hi ha cap evidència que, per les
+correlacions existents, es pugui disminuïr el nombre de variables.
+
+\hypertarget{regressiuxf3-loguxedstica}{%
+\subsection{Regressió logística}\label{regressiuxf3-loguxedstica}}
+
+La regresió logística és un model que intentar predir el resultat
+(\texttt{output}) a partir de la resta de variabels mitjançant un model
+de regressió estadística.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{regressio }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(output }\SpecialCharTok{\textasciitilde{}}\NormalTok{ age }\SpecialCharTok{+}\NormalTok{ sex }\SpecialCharTok{+}\NormalTok{ cp }\SpecialCharTok{+}\NormalTok{ trtbps }\SpecialCharTok{+}\NormalTok{ chol }\SpecialCharTok{+}\NormalTok{ fbs }\SpecialCharTok{+}\NormalTok{ restecg }\SpecialCharTok{+}\NormalTok{ thalachh }\SpecialCharTok{+}\NormalTok{ exng }\SpecialCharTok{+}\NormalTok{ oldpeak }\SpecialCharTok{+}\NormalTok{ slp }\SpecialCharTok{+}\NormalTok{ caa }\SpecialCharTok{+}\NormalTok{ thall, }\AttributeTok{data =}\NormalTok{ dfHAN)}
+\FunctionTok{summary}\NormalTok{(regressio)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = output ~ age + sex + cp + trtbps + chol + fbs + 
+##     restecg + thalachh + exng + oldpeak + slp + caa + thall, 
+##     data = dfHAN)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.01468 -0.18519  0.03069  0.22575  1.02624 
+## 
+## Coefficients:
+##                                      Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)                           0.30215    0.25796   1.171 0.242466    
+## age                                   0.02464    0.02406   1.024 0.306638    
+## sexMasculí                           -0.16407    0.04823  -3.402 0.000766 ***
+## cpAngina típica                      -0.16886    0.06397  -2.640 0.008767 ** 
+## cpDolor no relacionat amb angina      0.05637    0.06102   0.924 0.356389    
+## cpSense dolor toràcic                 0.09685    0.08875   1.091 0.276084    
+## trtbps                               -0.04104    0.02137  -1.920 0.055844 .  
+## chol                                 -0.01653    0.02084  -0.793 0.428416    
+## fbsNormal                            -0.03335    0.05749  -0.580 0.562362    
+## restecgHipertrofia ventricular       -0.13405    0.17685  -0.758 0.449098    
+## restecgNormal                        -0.04699    0.04083  -1.151 0.250823    
+## thalachh                              0.04285    0.02563   1.672 0.095634 .  
+## exngSi exercici                      -0.09352    0.04999  -1.871 0.062437 .  
+## oldpeak                              -0.04828    0.02674  -1.806 0.072023 .  
+## slpPendent descendent                 0.13900    0.04953   2.806 0.005364 ** 
+## slpPendent plana                      0.06540    0.08593   0.761 0.447281    
+## caaObstrucció de quatre vasos         0.38693    0.16945   2.284 0.023149 *  
+## caaObstrucció de tres vasos           0.04660    0.09558   0.488 0.626212    
+## caaObstrucció en un vas               0.07225    0.07324   0.987 0.324711    
+## caaSense obstrucció                   0.34261    0.06825   5.020  9.2e-07 ***
+## thallNo hi ha antecedents             0.22837    0.25437   0.898 0.370068    
+## thallPresència de defecte reversible  0.07849    0.24369   0.322 0.747623    
+## thallPresència defecte fix            0.28800    0.24183   1.191 0.234694    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.335 on 280 degrees of freedom
+## Multiple R-squared:  0.5818, Adjusted R-squared:  0.549 
+## F-statistic: 17.71 on 22 and 280 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+Podem veure que amb la regressió múltiple \(R^2=0.5489541\), que ens
+indica que, amb aquest model, tot el conjunt de variables disponibles
+expliquen el 54.9\% de la variable objetivo \texttt{output}.
+
+\hypertarget{test-dhipuxf2tesi}{%
+\subsection{Test d'hipòtesi}\label{test-dhipuxf2tesi}}
+
+Ens demanam si les dones tenen major probabilitat de tenir un ataca de
+cor que els dones. Podem veure la gràfica comparativa per gènere:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{plotbySex}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prac2_files/figure-latex/unnamed-chunk-2-1.pdf}
+
+En la mostra hi ha un percentatge major de dones amb alta probabilitat
+de tenir un atac de cor que d'homes; però ens demanam si aquesta
+diferència és significativa ja que podria ser fruït de l'atzar de la
+mostra.
+
+\hypertarget{hipuxf2tesi}{%
+\subsubsection{Hipòtesi}\label{hipuxf2tesi}}
+
+La hipòtesi nul·la, o \(H_{0}\) és: \textbf{La probabilitat de tenir un
+atac de cor de les dones és igual a la probabilitat de tenir un atac de
+cor dels homes}
+
+La hipòtesi alternativa, o \(H_{1}\) és: \textbf{La probabilitat de
+tenir un atac de cor de les dones és superior a la probabilitat de tenir
+un atac de cor dels homes}
+
+\hypertarget{contrast}{%
+\subsubsection{Contrast}\label{contrast}}
+
+Es tracta d'un test de contraste unilateral sobre dues mostres (les
+probabilitats de tenir atac de cor de les dones i les dels homes) en
+relació a les seves probabilitats de tenir un atac de cor.
+
+Per determinar el test a aplicar, és pertinent aplicar el teorema del
+límit central que estableix que el contrast d'hipòtesi sobre una mitjana
+d'una mostra s'aproxima a una distribució normal encara que la població
+original no segueixi una distribució normal, sempre que la mida de la
+mostra sigui suficientment gran (superior a 30). Això ja ho hem vist en
+l'apartat del Test de normalitat.
+
+Perquè es puguin donar les condicions para aplicar el teorema del límit
+central, el tamany de les dues mostres ha de ser superior a 30;
+vegem-ho:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mostra\_dones }\OtherTok{\textless{}{-}}\NormalTok{ dfHAN}\SpecialCharTok{$}\NormalTok{output[dfHAN}\SpecialCharTok{$}\NormalTok{sex}\SpecialCharTok{==}\StringTok{"Femení"}\NormalTok{]}
+\NormalTok{mostra\_homes }\OtherTok{\textless{}{-}}\NormalTok{ dfHAN}\SpecialCharTok{$}\NormalTok{output[dfHAN}\SpecialCharTok{$}\NormalTok{sex}\SpecialCharTok{==}\StringTok{"Masculí"}\NormalTok{]}
+\FunctionTok{print}\NormalTok{( }\FunctionTok{paste}\NormalTok{(}\StringTok{"La mostra de les dones és de"}\NormalTok{, }\FunctionTok{length}\NormalTok{(mostra\_dones), }\StringTok{"observacions"}\NormalTok{) )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "La mostra de les dones és de 96 observacions"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{print}\NormalTok{( }\FunctionTok{paste}\NormalTok{(}\StringTok{"La mostra dels homes és de"}\NormalTok{, }\FunctionTok{length}\NormalTok{(mostra\_homes), }\StringTok{"observacions"}\NormalTok{) )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "La mostra dels homes és de 207 observacions"
+\end{verbatim}
+
+Podem veure que les dues mostres compleixen les hipòtesis del teorema
+del límit central i, per tant podem assumir que segueixen lleis normals.
+
+Les variances de les poblacions (la població de les dones i dels homes)
+no les coneixem. Només tenim, òbviament, les respectives variances
+mostrals. A continuació, necessitam saber si les variances de les dues
+poblacions són iguales o no, Per això cal fer un \textbf{test
+d'homoscedasticitat}:
+
+Assumim (per l'argument anterior) que les dues mostres correponen a dues
+poblacions normals independents \(N(\mu_{1},\sigma_{1})\) i
+\(N(\mu_{2},\sigma_{2})\). Aleshores la variable aleatòria següent
+segueix una distribució F d'Snedecor amb \(n_1-1\) i \(n_2-1\) graus de
+llibertat:
+\[ F=\frac{\frac{s_{1}^{2}}{\sigma_{1}^{2}}}{\frac{s_{2}^{2}}{\sigma_{2}^{2}}}  \]
+
+On \(s_1\) i \(s_2\) són les desviacions estàndards mostrals i
+\(\sigma_{1}\) i \(\sigma_{2}\) les desviacions poblacionals.
+
+Sota la hipòtesi nul·la \(H_{0}: \sigma_{1}^{2}=\sigma_{2}^{2}\), el
+test estadístic és:
+\[ f_{obs}=\frac{s_{1}^{2}}{s_{2}^{2}}\sim F_{n_{1}-1,n_{2}-1}  \] On F
+és una distribució d'Snedecor amb \(n_1-1\) i \(n_2-1\) graus de
+llibertat.
+
+La hipòtesi alternativa \(H_{1}: \sigma_{1}^{2}\neq \sigma_{2}^{2}\)
+
+Facem el càlcul en R:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{var.test}\NormalTok{( mostra\_dones, mostra\_homes)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  F test to compare two variances
+## 
+## data:  mostra_dones and mostra_homes
+## F = 0.76208, num df = 95, denom df = 206, p-value = 0.1343
+## alternative hypothesis: true ratio of variances is not equal to 1
+## 95 percent confidence interval:
+##  0.5455293 1.0885394
+## sample estimates:
+## ratio of variances 
+##          0.7620767
+\end{verbatim}
+
+Podem veure que el valor de l'estadístic cau en la zona d'acceptació de
+l'hipòtesi nul·la. De fet, obtenim un valor de \emph{p} superior a
+\(\alpha\) i, per tant, no podem rebutjar la hipòtesi nul·la. Per tant,
+les variances poblacionals són essencialment iguales.
+
+En resum, el test a aplicar és el corresponent a dues mostres
+independents corresponents a poblacions que se poden aproximar a una
+llei normal, sobre la mitjana amb variances desconegudes però iguales.
+
+\hypertarget{cuxe0lculs}{%
+\subsubsection{Càlculs}\label{cuxe0lculs}}
+
+El test estadístic de la diferència de les dues mitjanes segueix una
+distribució t d'Student amb \(n_{1}+n_{2}-2\) graus de llibertat:
+\[ t=\frac{\bar{x}_{1}-\bar{x}_{2}}{S\sqrt{\frac{1}{n_{1}}+\frac{1}{n_{2}}}}\sim  t_{n_{1}+n_{2}-2} \]
+
+El valor \emph{S} és la desviació típica comuna que es calcula com:
+\[ S=\sqrt{\frac{(n_1-1)S_1^2+(n_2-1)S_2^2}{n_1+n_2-2}} \] On \(s_1^2\)
+i \(s_2^2\) són les variances mostrals estimades.
+
+Sota la hipòtesi nul·la \(H_0\):
+\(P(t_{\alpha/2}\le t_{obs} \le t_{1-\alpha/2})=1-\alpha\)
+
+Per tant, la zona d'acceptació és \([t_{\alpha/2},t_{1-\alpha/2}]\).
+
+Facem el càlcul en R:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{alfa    }\OtherTok{\textless{}{-}} \FloatTok{0.05}
+\CommentTok{\# Tamany de les mostres}
+\NormalTok{nd }\OtherTok{\textless{}{-}} \FunctionTok{length}\NormalTok{(mostra\_dones)}
+\NormalTok{nh }\OtherTok{\textless{}{-}} \FunctionTok{length}\NormalTok{(mostra\_homes)}
+\CommentTok{\# Mitjanes de les mostres}
+\NormalTok{md }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(mostra\_dones)}
+\NormalTok{mh }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(mostra\_homes)}
+\CommentTok{\# Desviació estàndard de les mostres}
+\NormalTok{sd }\OtherTok{\textless{}{-}} \FunctionTok{sd}\NormalTok{(mostra\_dones)}
+\NormalTok{sh }\OtherTok{\textless{}{-}} \FunctionTok{sd}\NormalTok{(mostra\_homes)}
+
+\CommentTok{\# Valor de l\textquotesingle{}estadístic}
+\NormalTok{S    }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{( ( (nd}\DecValTok{{-}1}\NormalTok{)}\SpecialCharTok{*}\NormalTok{sd}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{+}\NormalTok{ (nh}\DecValTok{{-}1}\NormalTok{)}\SpecialCharTok{*}\NormalTok{sh}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{ ) }\SpecialCharTok{/}\NormalTok{ (nd}\SpecialCharTok{+}\NormalTok{nh}\DecValTok{{-}2}\NormalTok{) )}
+\NormalTok{tobs }\OtherTok{\textless{}{-}}\NormalTok{ (md}\SpecialCharTok{{-}}\NormalTok{mh)}\SpecialCharTok{/}\NormalTok{(S}\SpecialCharTok{*}\FunctionTok{sqrt}\NormalTok{( }\DecValTok{1}\SpecialCharTok{/}\NormalTok{nd }\SpecialCharTok{+} \DecValTok{1}\SpecialCharTok{/}\NormalTok{nh ))}
+\CommentTok{\# Valors crítics}
+\NormalTok{tcrit.L }\OtherTok{\textless{}{-}} \FunctionTok{qt}\NormalTok{( alfa}\SpecialCharTok{/}\DecValTok{2}\NormalTok{, }\AttributeTok{df=}\NormalTok{nd}\SpecialCharTok{+}\NormalTok{nh}\DecValTok{{-}2}\NormalTok{)}
+\NormalTok{tcrit.U }\OtherTok{\textless{}{-}} \FunctionTok{qt}\NormalTok{( alfa}\SpecialCharTok{/}\DecValTok{2}\NormalTok{, }\AttributeTok{df=}\NormalTok{nd}\SpecialCharTok{+}\NormalTok{nh}\DecValTok{{-}2}\NormalTok{, }\AttributeTok{lower.tail=}\ConstantTok{FALSE}\NormalTok{)}
+\CommentTok{\# Valor de p}
+\NormalTok{valor\_p }\OtherTok{\textless{}{-}} \FunctionTok{pt}\NormalTok{( }\FunctionTok{abs}\NormalTok{(tobs), }\AttributeTok{df=}\NormalTok{nd}\SpecialCharTok{+}\NormalTok{nh}\DecValTok{{-}2}\NormalTok{, }\AttributeTok{lower.tail=}\ConstantTok{FALSE}\NormalTok{)}\SpecialCharTok{*}\DecValTok{2}
+\FunctionTok{print}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"Valor observat:"}\NormalTok{, }\FunctionTok{round}\NormalTok{(tobs,}\DecValTok{2}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Valor observat: 5.08"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{print}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"Interval d\textquotesingle{}acceptació: ["}\NormalTok{,}\FunctionTok{round}\NormalTok{(tcrit.L, }\DecValTok{2}\NormalTok{),}\StringTok{","}\NormalTok{, }\FunctionTok{round}\NormalTok{(tcrit.U, }\DecValTok{2}\NormalTok{), }\StringTok{"]"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Interval d'acceptació: [ -1.97 , 1.97 ]"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{print}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"Valor de p:"}\NormalTok{, }\FunctionTok{round}\NormalTok{(valor\_p, }\DecValTok{2}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Valor de p: 0"
+\end{verbatim}
+
+\hypertarget{interpretaciuxf3}{%
+\subsubsection{Interpretació}\label{interpretaciuxf3}}
+
+Podem veure que l'observació de l'estadístic considerat és 5.08, valor
+que cau fora la zona d'acceptació: {[}-1.97, 1.97{]}. Per tant podem
+rebutjar la hipòtesi nul·la amb un nivell de confiança del 95\%.
+
+El valor de p (probabilitat de l'error que s'estaria cometent si es
+rebutja la hipòtesi nul·la essent aquesta certa) és de 0. Un valor
+inferior a \(\alpha\).
+
+Com a conseqüència, hem de rebutjar la hipòtesi nul·la a favor de
+l'alternativa: \textbf{La probabilitat de tenir un atac de cor de les
+dones és superior a la probabilitat de tenir un atac de cor dels homes}
+
+\hypertarget{model-no-supervisat}{%
+\subsection{Model no supervisat}\label{model-no-supervisat}}
+
+Anem a generar un model no supervisat basat en l'algorisme
+\emph{k\_means}. El paràmetre fundamental és el valor de k, que
+coincideix amb el nombre de grups que volem trobar. En realitat en el
+nostre problema volem classificar les observacions en dos grups: els que
+tenen risc d'atac de cor i els que no; per tant, el valor que ens
+interessa és k=2; però abans analitzarem quin és el valor de k amb el
+que podem obtenir uns clústers més diferenciats:
+
+\textbf{Estimació del millor valor de k pel mètode Calinski-Harabasz}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fit\_ch  }\OtherTok{\textless{}{-}} \FunctionTok{kmeansruns}\NormalTok{(dfHANnum, }\AttributeTok{krange =} \DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{, }\AttributeTok{criterion =} \StringTok{"ch"}\NormalTok{) }
+\NormalTok{fit\_asw }\OtherTok{\textless{}{-}} \FunctionTok{kmeansruns}\NormalTok{(dfHANnum, }\AttributeTok{krange =} \DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{, }\AttributeTok{criterion =} \StringTok{"asw"}\NormalTok{) }
+
+\NormalTok{fit\_ch}\SpecialCharTok{$}\NormalTok{bestk}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fit\_asw}\SpecialCharTok{$}\NormalTok{bestk}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{plot}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{,fit\_ch}\SpecialCharTok{$}\NormalTok{crit,}\AttributeTok{type=}\StringTok{"o"}\NormalTok{,}\AttributeTok{col=}\StringTok{"blue"}\NormalTok{,}\AttributeTok{pch=}\DecValTok{0}\NormalTok{,}\AttributeTok{xlab=}\StringTok{"Número de clústers"}\NormalTok{,}\AttributeTok{ylab=}\StringTok{"Criteri Calinski{-}Harabasz"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prac2_files/figure-latex/unnamed-chunk-3-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{plot}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{,fit\_asw}\SpecialCharTok{$}\NormalTok{crit,}\AttributeTok{type=}\StringTok{"o"}\NormalTok{,}\AttributeTok{col=}\StringTok{"blue"}\NormalTok{,}\AttributeTok{pch=}\DecValTok{0}\NormalTok{,}\AttributeTok{xlab=}\StringTok{"Número de clústers"}\NormalTok{,}\AttributeTok{ylab=}\StringTok{"Criteri silueta mitja"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prac2_files/figure-latex/unnamed-chunk-3-2.pdf}
+
+Podem veure que el millor valor de k és 2, per tant, facem una
+clusterització en 2 grups i analitzem la qualitat. Per poder visualitzar
+el resultat, ho projectarem sobre les dues primeres components
+principals:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{d }\OtherTok{\textless{}{-}} \FunctionTok{daisy}\NormalTok{(dfHANnum)}
+\NormalTok{millor\_qualitat }\OtherTok{\textless{}{-}} \DecValTok{0}
+\ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{50}\NormalTok{) \{}
+\NormalTok{  fit }\OtherTok{\textless{}{-}} \FunctionTok{kmeans}\NormalTok{(dfHANnum, }\DecValTok{2}\NormalTok{)}
+\NormalTok{  y\_cluster }\OtherTok{\textless{}{-}}\NormalTok{ fit}\SpecialCharTok{$}\NormalTok{cluster}
+\NormalTok{  sk }\OtherTok{\textless{}{-}} \FunctionTok{silhouette}\NormalTok{(y\_cluster, d)}
+\NormalTok{  qualitat }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(sk[,}\DecValTok{3}\NormalTok{])}
+  \ControlFlowTok{if}\NormalTok{ (qualitat}\SpecialCharTok{\textgreater{}}\NormalTok{millor\_qualitat) \{}
+\NormalTok{    millor\_qualitat }\OtherTok{\textless{}{-}}\NormalTok{ qualitat}
+\NormalTok{    millor\_fit }\OtherTok{\textless{}{-}}\NormalTok{ fit}
+\NormalTok{  \}}
+\NormalTok{\}}
+\NormalTok{fit2       }\OtherTok{\textless{}{-}}\NormalTok{ millor\_fit}
+\NormalTok{y\_cluster2 }\OtherTok{\textless{}{-}}\NormalTok{ fit2}\SpecialCharTok{$}\NormalTok{cluster}
+
+\FunctionTok{clusplot}\NormalTok{(dfHANnum, fit2}\SpecialCharTok{$}\NormalTok{cluster,}
+         \AttributeTok{color=}\ConstantTok{TRUE}\NormalTok{, }\AttributeTok{shade=}\ConstantTok{TRUE}\NormalTok{, }\AttributeTok{labels=}\DecValTok{5}\NormalTok{, }\AttributeTok{lines=}\DecValTok{0}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{prac2_files/figure-latex/unnamed-chunk-4-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sk2 }\OtherTok{\textless{}{-}} \FunctionTok{silhouette}\NormalTok{(y\_cluster2, d)}
+\NormalTok{qualitat2 }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(sk2[,}\DecValTok{3}\NormalTok{])}
+
+\NormalTok{qualitat2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.2435173
+\end{verbatim}
+
+La qualitat de la clusterització segons la silueta és 0.2435173; un
+valor molt baix. Visualment no s'aprecia una clara separació dels dos
+grups.
+
+Comparem els dos grups trobats amb la variable \texttt{output}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{resultat1 }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{( }\FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{4}\NormalTok{), }\AttributeTok{nrow=}\DecValTok{2}\NormalTok{, }\AttributeTok{ncol =} \DecValTok{2}\NormalTok{,}
+            \AttributeTok{dimnames=}\FunctionTok{list}\NormalTok{( }\FunctionTok{c}\NormalTok{(}\StringTok{"Grup 1"}\NormalTok{, }\StringTok{"Grup 2"}\NormalTok{),}
+                           \FunctionTok{c}\NormalTok{(}\StringTok{"Atac probable"}\NormalTok{, }\StringTok{"Atac poc probable"}\NormalTok{)))}
+
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\FunctionTok{nrow}\NormalTok{(dfHANnum)) \{}
+\NormalTok{ resultat1[fit2}\SpecialCharTok{$}\NormalTok{cluster[i],dfHAN}\SpecialCharTok{$}\NormalTok{output[i]}\SpecialCharTok{+}\DecValTok{1}\NormalTok{] }\OtherTok{\textless{}{-}}\NormalTok{ resultat1[fit2}\SpecialCharTok{$}\NormalTok{cluster[i],dfHAN}\SpecialCharTok{$}\NormalTok{output[i]}\SpecialCharTok{+}\DecValTok{1}\NormalTok{] }\SpecialCharTok{+} \DecValTok{1}
+\NormalTok{\}}
+
+\NormalTok{total }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(resultat1)}
+
+\NormalTok{opc1 }\OtherTok{\textless{}{-}} \FunctionTok{round}\NormalTok{(}\DecValTok{100} \SpecialCharTok{*}\NormalTok{ (resultat1[}\StringTok{"Grup 1"}\NormalTok{, }\StringTok{"Atac probable"}\NormalTok{] }\SpecialCharTok{+}\NormalTok{ resultat1[}\StringTok{"Grup 2"}\NormalTok{, }\StringTok{"Atac poc probable"}\NormalTok{] ) }\SpecialCharTok{/}\NormalTok{ total, }\DecValTok{1}\NormalTok{)}
+\NormalTok{opc2 }\OtherTok{\textless{}{-}} \FunctionTok{round}\NormalTok{( }\DecValTok{100} \SpecialCharTok{*}\NormalTok{ (resultat1[}\StringTok{"Grup 1"}\NormalTok{, }\StringTok{"Atac poc probable"}\NormalTok{] }\SpecialCharTok{+}\NormalTok{ resultat1[}\StringTok{"Grup 2"}\NormalTok{, }\StringTok{"Atac probable"}\NormalTok{] ) }\SpecialCharTok{/}\NormalTok{ total, }\DecValTok{1}\NormalTok{)}
+\NormalTok{millor\_opc }\OtherTok{\textless{}{-}} \FunctionTok{max}\NormalTok{( opc1, opc2)}
+\NormalTok{resultat1}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        Atac probable Atac poc probable
+## Grup 1            50               128
+## Grup 2            88                37
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{print}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"Si Grup 1 = Atac probable llavors, percentatge encert:"}\NormalTok{, opc1 ))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Si Grup 1 = Atac probable llavors, percentatge encert: 28.7"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{print}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"Si Grup 1 = Atac poc probable llavors, percentatge encert:"}\NormalTok{, opc2))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Si Grup 1 = Atac poc probable llavors, percentatge encert: 71.3"
+\end{verbatim}
+
+Podem veure que la millor opció d'interpretació dels resultats dels dos
+grups ens dóna un percentatge d'encert de 71.3\%.
+
+\textbf{Conclusió:}
+
+Els dos grups trobats considerats com a clústers no estan gens separats
+en distància. De fet si calculam la mesura de la silueta sobre la
+classificació coneguda, obtenim una qualitat molt baixa de 0.2393498.
+L'algorismes de clusterització només encerta en un 71.3\% dels casos amb
+la classificació real.
+
+\hypertarget{model-supervisat}{%
+\subsection{Model supervisat}\label{model-supervisat}}
+
+Ara aplicarem un model supervisat basat en la generació de regles de
+classificació a partir d'un arbre de decisions. Farem servir les dades
+categòriques amb la discretització de les variables numériques; però
+abans hem de separar el data set en dos: un per entrenar l'algorisme i
+l'altre per validar-ho. Farem servir la proporció habitual de 2/3 per
+entrenament i 1/3 per test.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{indexes }\OtherTok{=} \DecValTok{1}\SpecialCharTok{:}\NormalTok{(}\FunctionTok{nrow}\NormalTok{(dfHAN)}\SpecialCharTok{/}\DecValTok{3}\NormalTok{) }\SpecialCharTok{*} \DecValTok{3} \SpecialCharTok{{-}} \DecValTok{2}
+
+\NormalTok{train }\OtherTok{\textless{}{-}}\NormalTok{ dfHANcat[indexes,]}
+\NormalTok{test }\OtherTok{\textless{}{-}}\NormalTok{ dfHANcat[}\SpecialCharTok{{-}}\NormalTok{indexes,]}
+\NormalTok{testY }\OtherTok{\textless{}{-}}\NormalTok{ dfHAN[}\SpecialCharTok{{-}}\NormalTok{indexes,}\DecValTok{14}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+Una vegada feta la separació aleatòria de les mostres, convé realitzar
+una mínima anàlisi de dades per a assegurar-nos de no obtenir
+classificadors esbiaixats pels valors que conté cada mostra. En aquest
+cas, verificarem que la proporció del prèstecs bons i dolents és més o
+menys constant en els dos conjunts:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{bons\_tr }\OtherTok{\textless{}{-}}\NormalTok{ ( train }\SpecialCharTok{\%\textgreater{}\%}
+             \FunctionTok{filter}\NormalTok{( resultat }\SpecialCharTok{==} \StringTok{"Atac probable"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+             \FunctionTok{nrow}\NormalTok{() )}
+      
+
+\NormalTok{num\_tr }\OtherTok{\textless{}{-}}\NormalTok{ train }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{nrow}\NormalTok{()}
+
+\NormalTok{percen\_tr }\OtherTok{\textless{}{-}} \FunctionTok{round}\NormalTok{((bons\_tr }\SpecialCharTok{/}\NormalTok{ num\_tr)}\SpecialCharTok{*}\DecValTok{100}\NormalTok{, }\AttributeTok{digits=}\DecValTok{1}\NormalTok{)}
+
+\NormalTok{bons\_ts }\OtherTok{\textless{}{-}}\NormalTok{ ( test }\SpecialCharTok{\%\textgreater{}\%}
+             \FunctionTok{filter}\NormalTok{( resultat }\SpecialCharTok{==} \StringTok{"Atac probable"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+             \FunctionTok{nrow}\NormalTok{() )}
+
+\NormalTok{num\_ts }\OtherTok{\textless{}{-}}\NormalTok{ test }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{nrow}\NormalTok{()}
+
+\NormalTok{percen\_ts }\OtherTok{\textless{}{-}} \FunctionTok{round}\NormalTok{((bons\_ts }\SpecialCharTok{/}\NormalTok{ num\_ts)}\SpecialCharTok{*}\DecValTok{100}\NormalTok{, }\AttributeTok{digits=}\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Es pot veure que els percentatges de probabilitat d'atacs de cor del
+conjunt d'entrenament i del conjunt de test són semblants (45.5\% i
+45.5\% respectivament). Per tant, consideram correctes els jocs
+d'entrenament i el de test.
+
+Anem a generar el model de regles de decisió per determinar si la
+probabilitat d'atac de cor és o no alta. Ho farem amb l¡'algorisme
+\emph{random Forest}, tècnica en què genera diversos classificadors amb
+els seus arbres de decisió per, finalment, registrar-ne tots els
+resultats i determinar-ne la classe final.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rf }\OtherTok{\textless{}{-}} \FunctionTok{randomForest}\NormalTok{(resultat }\SpecialCharTok{\textasciitilde{}}\NormalTok{ ., }\AttributeTok{data=}\NormalTok{train)}
+\FunctionTok{print}\NormalTok{(rf)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+##  randomForest(formula = resultat ~ ., data = train) 
+##                Type of random forest: classification
+##                      Number of trees: 500
+## No. of variables tried at each split: 3
+## 
+##         OOB estimate of  error rate: 13.86%
+## Confusion matrix:
+##                   Atac poc probable Atac probable class.error
+## Atac poc probable                50             5  0.09090909
+## Atac probable                     9            37  0.19565217
+\end{verbatim}
+
+Validem el model amb el joc de test:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pred }\OtherTok{=} \FunctionTok{predict}\NormalTok{(rf, }\AttributeTok{newdata=}\NormalTok{test[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{12}\NormalTok{])}
+\NormalTok{cm }\OtherTok{=} \FunctionTok{table}\NormalTok{(test[,}\DecValTok{13}\NormalTok{], pred)}
+
+\NormalTok{precisio\_model }\OtherTok{\textless{}{-}} \FunctionTok{round}\NormalTok{( }\DecValTok{100} \SpecialCharTok{*} \FunctionTok{sum}\NormalTok{(}\FunctionTok{diag}\NormalTok{(cm)) }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(cm), }\AttributeTok{digits =} \DecValTok{2}\NormalTok{ )}
+\FunctionTok{print}\NormalTok{(}\FunctionTok{sprintf}\NormalTok{(}\StringTok{"La precisión del árbol es: \%.1f \%\%"}\NormalTok{, precisio\_model))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "La precisión del árbol es: 80.2 %"
+\end{verbatim}
+
+Podem veure que obtenim un model de decisió d'arbre amb una taxa de
+predicció del (80.2\%).
+
+Vegem la taula de confusió:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{CrossTable}\NormalTok{(test[,}\DecValTok{13}\NormalTok{], pred, }\AttributeTok{prop.chisq  =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{prop.c =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{prop.r =}\ConstantTok{TRUE}\NormalTok{,}\AttributeTok{dnn =} \FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}Reality\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Prediction\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  
+##    Cell Contents
+## |-------------------------|
+## |                       N |
+## |           N / Row Total |
+## |         N / Table Total |
+## |-------------------------|
+## 
+##  
+## Total Observations in Table:  202 
+## 
+##  
+##                   | Prediction 
+##           Reality | Atac poc probable |     Atac probable |         Row Total | 
+## ------------------|-------------------|-------------------|-------------------|
+## Atac poc probable |                92 |                18 |               110 | 
+##                   |             0.836 |             0.164 |             0.545 | 
+##                   |             0.455 |             0.089 |                   | 
+## ------------------|-------------------|-------------------|-------------------|
+##     Atac probable |                22 |                70 |                92 | 
+##                   |             0.239 |             0.761 |             0.455 | 
+##                   |             0.109 |             0.347 |                   | 
+## ------------------|-------------------|-------------------|-------------------|
+##      Column Total |               114 |                88 |               202 | 
+## ------------------|-------------------|-------------------|-------------------|
+## 
+## 
+\end{verbatim}
+
+\hypertarget{resoluciuxf3-del-problema}{%
+\section{Resolució del problema}\label{resoluciuxf3-del-problema}}
+
+A partir del fitxer de dades, hem fet unes tasques de preprocessament:
+
+\begin{itemize}
+\tightlist
+\item
+  Anàlisi exploratori
+\item
+  Neteja de dades, on hem vist que les dades estaven molt netes i
+  únicament hem fet una normalització i una discretització de valors.
+\end{itemize}
+
+Amb les dades preprocessades, hem fet una sèrie d'anàlisi:
+
+\begin{itemize}
+\tightlist
+\item
+  Una anàlisi de components principals, on hem vist que amb 4 components
+  principals es pot explicar el 90\% de la variabilitat total.
+\item
+  Un test de normalitat, que han sortir negatius; no obstant és possible
+  aplicar el teorema del límit central perquè tenim moltes dades.
+\item
+  Un estudi de correlacions entre les variables, que ha conclos que
+  aquestes son molt febles.
+\item
+  Una regressió logística, que ens ha permet disposar d'un model de
+  predicció de la probabilitat d'atac de cor amb una fiabilitat del
+  55\%.
+\item
+  Un test d'hipòtesi, que ens ha permet confirmar una diferència que
+  s'intuïa en les gràfiques: que les dones tenen més probabilitat de
+  tenir un atac de cor que els homes.
+\item
+  Hem aplicat un model no supervisat per clusteritzar les dades en dos
+  grups (una vegada normalitzades les dades), i hem onbtingut un model
+  predictiu amb un percentatge d'encerts del 71\%.
+\item
+  Per últim hem obtingut un model supervisat basat en un algorisme de
+  classificació \emph{randomForest} amb una taxa de predicció del 80\%.
+\end{itemize}
+
+En definitiva, amb aquesta pràctica hem seguit les fases del cicle de
+vida de les dades: captura, emmagazematge, prepocessat, anàlisi,
+visualització i publicació.
 
 \end{document}

@@ -3,6 +3,10 @@ title: 'M2.951 - Tipologia i cicle de vida de les dades'
 author: "Autors: Francisco J. Bastida López (fbastidal@uoc.edu) / Ivan Benaiges Trenchs (ibenaiges@uoc.edu)"
 date: "Juny 2023"
 output:
+  word_document: default
+  pdf_document:
+    highlight: zenburn
+    toc: yes
   html_document:
     highlight: default
     number_sections: yes
@@ -11,10 +15,6 @@ output:
     toc_depth: 4
     includes:
       in_header: header.html
-  word_document: default
-  pdf_document:
-    highlight: zenburn
-    toc: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -427,7 +427,9 @@ Comencem amb un test de Shapiro-Wilk de normalitat:
 apply( dfHANnum, 2, shapiro.test )
 ```
 
-Tots els test mostren que les variables no segueixen una distribució totalment normal. No obstant, pel *Teorema del Límit Central*, al tractar-se d'una quantitat elevada d'observacions, es pot considerar que tendeixen a una distribució normal. Per corroborar aquest punt, generem els gràfics QQ per veure si la tendència és normal o no:
+Tots els test mostren que les variables no segueixen una distribució totalment normal. 
+No obstant, es compleixen els requisits per pode aplica el *Teorema del Límit Central*. 
+ Mostram a continuació els gràfics QQ per mostrar gràficament la normalitat de les dades:
 
 ```{r 3_2_grafic_qq_variables_numeriques_joc_dades, echo=TRUE, message=FALSE, warning=FALSE}
 # Creem els diferents gràfics QQ per comprovar si les dades de les variables segueixen o s'aproximen a una distribució normal:
